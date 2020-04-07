@@ -4,6 +4,14 @@ This project was generated using [Nx](https://nx.dev).
 
 <p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" width="450"></p>
 
+
+## Workflows
+
+```bash
+> nx serve api
+> nx serve monophyletic
+```
+
 ## Getting started
 
 Following along with the [official video tutorial](https://www.youtube.com/watch?v=Y9ZgpvcFUXs&list=PLakNactNC1dH38AfqmwabvOszDmKriGco&index=4).
@@ -21,13 +29,14 @@ built using web components]
 ? Which stylesheet format would you like to use? CSS
 ? Would you like to add React Router to this application? Yes
 
->nx serve monophyletic
->nx g @nrwl/react:lib ui-header
+> nx serve monophyletic
+> nx g @nrwl/react:lib ui-header
 > nx g @nrwl/react:component --project=ui-header page-title
 > nx dep-graph
 > npm i @nrwl/express
 > npm i @nrwl/express --help
 > nx g @nrwl/express: app api --frontendProject=monophyletic
+> nx serve api
 ```
 
 Some errors during this process.
@@ -47,6 +56,17 @@ Module not found: Error: Can't resolve 'react-router-dom' in 'C:\Users\timof\rep
 ```
 
 Tried a number of different approaches, but couldn't get the app to run again.  It was serving and I was able to include the ui-header page title component in the app.  [This article](https://dev.to/stereobooster/typescript-monorepo-for-react-project-3cpa) suggests using yarn instead of npm in a monorepo because *it supports workspaces to link cross-dependencies.*  That's a decent reason to use yarn, which I have used for another monorepo before, but without having a good reason to use yarn.  Just it was a popular choice amon devs at the time.
+
+So if yarn is the answer here, do I have to go back and re-run some of those commands above with it?
+Such as adding express.  But this results in the same error:
+
+```bash
+yarn add @nrwl/express
+> nx g @nrwl/express: app api --frontendProject=monophyletic
+Schematic "@nrwl/express" not found in collection "@nrwl/web".
+```
+
+Then I actually read the output from the terminal which said you shouldn't mix package managers and to remove the package-lock.json file and run the command again.  This done, and our generate command works.  On with the show.
 
 ## Adding capabilities to your workspace
 

@@ -35,6 +35,9 @@
     },
     "ui-header": {
       "tags": []
+    },
+    "api": {
+      "tags": []
     }
   }
 }
