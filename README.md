@@ -4,12 +4,13 @@ This project was generated using [Nx](https://nx.dev).
 
 <p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" width="450"></p>
 
-
 ## Workflows
 
 ```bash
-> nx serve api
-> nx serve monophyletic
+> nx serve api // serve the API backend
+> nx serve monophyletic // serve the React front end
+> nx dep-graph // show the dependency graph
+> nx affected:dep-graph // show the deo-graph with updates needed
 ```
 
 ## Getting started
@@ -68,7 +69,13 @@ Schematic "@nrwl/express" not found in collection "@nrwl/web".
 
 Then I actually read the output from the terminal which said you shouldn't mix package managers and to remove the package-lock.json file and run the command again.  This done, and our generate command works.  On with the show.
 
+```bash
+nx g @nrwl/workspace:lib api-interface
+```
+
 ## Adding capabilities to your workspace
+
+The following is from the original readme created with the workspace.
 
 Nx supports many plugins which add capabilities for developing different types of applications and different tools.
 

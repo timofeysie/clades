@@ -16,7 +16,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@clades/ui-header": ["libs/ui-header/src/index.ts"]
+      "@clades/ui-header": ["libs/ui-header/src/index.ts"],
+      "@clades/api-interface": ["libs/api-interface/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

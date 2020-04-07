@@ -1,16 +1,16 @@
 import React from 'react';
 import './app.css';
 import { ReactComponent as Logo } from './logo.svg';
-import star from './star.svg';
 import { Route, Link } from 'react-router-dom';
 import { PageTitle } from '@clades/ui-header'
 import { useState, useEffect } from 'react';
+import { ApiResponse, API_URL } from '@clades/api-interface';
 
 export const App = () => {
 
-  const [apiResponse, setApiResponse] = useState({ message: 'Loading...' });
+  const [apiResponse, setApiResponse] = useState<ApiResponse>({ message: 'Loading...' });
   useEffect(() => {
-    fetch('/api').then(r => r.json()).then(setApiResponse);
+    fetch(API_URL).then(r => r.json()).then(setApiResponse);
   }, [])
   return (
     <div className="app">
