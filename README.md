@@ -4,6 +4,17 @@ This project was generated using [Nx](https://nx.dev).
 
 <p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" width="450"></p>
 
+Currently unit testing the counter example to create a guide for TDD workflow for NgRx Angular development.
+
+## Table of contents
+
+* [Testing Ngrx](#testing-ngrx)
+* [Implementing the counter example from the official docs](#implementing-the-counter-example-from-the-official-docs)
+* [NgRx counter example](#ngRx-counter-example)
+* [Steps for updated NgRx example enterprise app](#Steps-for-updated-NgRx-example-enterprise-app)
+* [The Official NgRx project](#the-Official-NgRx-project)
+* [Original automatically generated readme](#original-automatically-generated-readme)
+
 ## Workflows
 
 ```bash
@@ -25,6 +36,10 @@ ng affected:e2e # run e2e tests for current changes
 [The official docs](https://ngrx.io/guide/store/testing) suggest using a Mock Store.
 
 *The provideMockStore() function registers providers that allow you to mock out the Store for testing functionality that has a dependency on Store without setting up reducers. You can write tests validating behaviors corresponding to the specific state snapshot easily.  All dispatched actions don't affect the state, but you can see them in the Actions stream.*
+
+The docs start off with testing a fictional auth component.  Lets apply the mock store to the counter example.
+
+## Implementing the counter example from the official docs
 
 Trying this our on the counter example form the official docs.
 
@@ -144,21 +159,22 @@ Add the MyCounter component to your AppComponent template.
 
 ### Use the Redux devtools
 
-Install the Redux devtools for the Chrome browser by finding the "add more tools" link which will open this page:
+Install the Redux devtools for the Chrome browser by finding the "add more tools" link which will open [this page](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 
-https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
-
-Currently, nothings shows up.
+Currently, nothings shows up (unless you have another app open which uses a store, in which case you might see that store).
 
 *No store found. Make sure to [follow the instructions](https://github.com/zalmoxisus/redux-devtools-extension#usage).*
 
-The counter is working and using the store.  So an extra few steps are required.
+The counter is working and using the store.  So an extra few steps are required.  Looking at [this article](*https://alligator.io/angular/ngrx-store-redux-devtools/).
 
 ```bash
 yarn add @ngrx/store-devtools
 npm install @ngrx/store-devtools --save
 ```
 
+In the app.module.ts file, import StoreDevtoolsModule and add it to your NgModule’s imports:
+
+After this, in the Chrome inspector/Redux tab, we see the actions working on the counter.  How great is that?!
 
 ## NgRx counter example
 
@@ -171,21 +187,21 @@ npm install @ngrx/store-devtools --save
 
 In more detail.
 
-### 1. Define actions to express events
+### Step 1: Define actions to express events
 
 Create a new file named counter.actions.ts to describe the counter actions to increment, decrement, and reset its value.
 
-### 2. Define a reducer function to manage the state
+### Step 2: Define a reducer function to manage the state
 
 Define a reducer function to handle changes in the counter value based on the provided actions.
 
-### 3. Register the global state container that is available throughout the application
+### Step 3: Register the global state container that is available throughout the application
 
 Import the StoreModule from @ngrx/store and the counter.reducer file.
 
 Add the StoreModule.forRoot function in the imports array of your AppModule with an object containing the count and the counterReducer that manages the state of the counter. The StoreModule.forRoot() method registers the global providers needed to access the Store throughout your application.
 
-### 4. Inject the Store service to dispatch actions and select the current state
+### Step 4: Inject the Store service to dispatch actions and select the current state
 
 Create a new Component named my-counter in the app folder. Inject the Store service into your component to dispatch the counter actions, and use the select operator to select data from the state.
 
@@ -195,7 +211,9 @@ Update the MyCounterComponent class with a selector for the count, and methods t
 
 Add the MyCounter component to your AppComponent template.
 
-## An updated NgRx app
+## Steps for updated NgRx example enterprise app
+
+(This section is a work in progress)
 
 Due to problems with the completed [Workshop: Enterprise Angular applications with NgRx and Nx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/) which is more than two years out of date now, a new project following along the general steps of development used to create the customer portal there is the plan now.
 
@@ -290,6 +308,7 @@ ng g service services/auth/auth --project=auth
 
 ### Generate a shared data-model
 
+See the appropriate section in the workshop.
 
 ### Setting up Material Design
 
@@ -434,7 +453,8 @@ Again there are Extras in this step, such as "Add logout functionality" and "Add
 If we want to update the auth service to set a token in local storage, we can come back to this later.
 
 Finally, [step 10: NgRx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/10-ngrx-introduction)
-#
+
+### Create the server
 
 ```bash
 npm i json-server ts-node --save-dev
@@ -1041,8 +1061,6 @@ npm run dep-graph
 
 Then, the 18 step guide is done.  No thank you, no debrief.  Nothing.  Feeling like I can contribute to this subject on my own now.  Might try and write a blog about the RxJs used in the effects which is difficult to read for someone who may not be so familiar with the subject.
 
-#
-
 ## The Official NgRx project
 
 This workspace was first created while following along with the [official video tutorial](https://www.youtube.com/watch?v=Y9ZgpvcFUXs&list=PLakNactNC1dH38AfqmwabvOszDmKriGco&index=4).
@@ -1102,7 +1120,9 @@ Then I actually read the output from the terminal which said you shouldn't mix p
 nx g @nrwl/workspace:lib api-interface
 ```
 
-## Adding capabilities to your workspace
+## Original automatically generated readme
+
+### Adding capabilities to your workspace
 
 The following is from the original readme created with the workspace.
 
@@ -1112,20 +1132,14 @@ These capabilities include generating applications, libraries, etc as well as th
 
 Below are some plugins which you can add to your workspace:
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+* [React](https://reactjs.org)  - `npm install --save-dev @nrwl/react`
+* Web (no framework frontends)  - `npm install --save-dev @nrwl/web`
+* [Angular](https://angular.io)  - `npm install --save-dev @nrwl/angular`
+* [Nest](https://nestjs.com)  - `npm install --save-dev @nrwl/nest`
+* [Express](https://expressjs.com) - `npm install --save-dev @nrwl/express`
+* [Node](https://nodejs.org) - `npm install --save-dev @nrwl/node`
 
-## Generate an application
+### Generate an application
 
 Run `nx g @nrwl/react:app my-app` to generate an application.
 
@@ -1133,7 +1147,7 @@ Run `nx g @nrwl/react:app my-app` to generate an application.
 
 When using Nx, you can create multiple applications and libraries in the same workspace.
 
-## Generate a library
+### Generate a library
 
 Run `nx g @nrwl/react:lib my-lib` to generate a library.
 
@@ -1141,34 +1155,34 @@ Run `nx g @nrwl/react:lib my-lib` to generate a library.
 
 Libraries are sharable across libraries and applications. They can be imported from `@clades/mylib`.
 
-## Development server
+### Development server
 
 Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
 
-## Code scaffolding
+### Code scaffolding
 
 Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
 
-## Build
+### Build
 
 Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
-## Running unit tests
+### Running unit tests
 
 Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
 
 Run `nx affected:test` to execute the unit tests affected by a change.
 
-## Running end-to-end tests
+### Running end-to-end tests
 
 Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
 
 Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
 
-## Understand your workspace
+### Understand your workspace
 
 Run `nx dep-graph` to see a diagram of the dependencies of your projects.
 
-## Further help
+### Further help
 
 Visit the [Nx Documentation](https://nx.dev) to learn more.

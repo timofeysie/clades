@@ -37,6 +37,7 @@
     "@angular/platform-browser-dynamic": "^9.1.0",
     "@angular/router": "^9.1.0",
     "@ngrx/store": "^9.1.0",
+    "@ngrx/store-devtools": "^9.1.0",
     "@nrwl/angular": "^9.2.2",
     "@schematics/angular": "^9.1.1",
     "core-js": "^2.5.4",
