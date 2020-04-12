@@ -1411,6 +1411,11 @@
     merge-source-map "^1.1.0"
     schema-utils "^2.6.4"
 
+"@ngrx/store@^9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/store/-/store-9.1.0.tgz#1339716a34e2b389979d25464bb32b0dba799557"
+  integrity sha512-Ah2nApPZXTvKl7ybaFMIFwEdMg8b7PvIKATigbDTUftAsFxked2+T7blNv6aCgSfEqbOVMBTYPk7OsLCYZoz4Q==
+
 "@ngtools/webpack@9.1.0":
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-9.1.0.tgz#c082d9e64e5900189e4612f657d68e5b81ae277c"
@@ -1702,7 +1707,7 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@schematics/angular@~9.1.0":
+"@schematics/angular@^9.1.1", "@schematics/angular@~9.1.0":
   version "9.1.1"
   resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-9.1.1.tgz#5069f8f214fa2effb68a937cfb808ec612debe96"
   integrity sha512-V0DcDNgHQ2YR+PGZI6+pf/mUNNxt5SusShkZ1PbwIMk/HUQpzEGkLjm3v1Jw9eIZKiuDx615GNU1xDzQ/KyNRQ==
