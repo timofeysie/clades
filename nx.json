@@ -41,6 +41,13 @@
     },
     "api-interface": {
       "tags": []
+    },
+    "stratum": {
+      "tags": []
+    },
+    "stratum-e2e": {
+      "tags": [],
+      "implicitDependencies": ["stratum"]
     }
   }
 }

@@ -329,6 +329,129 @@
           }
         }
       }
+    },
+    "stratum": {
+      "projectType": "application",
+      "schematics": {
+        "@nrwl/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "apps/stratum",
+      "sourceRoot": "apps/stratum/src",
+      "prefix": "clades",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/stratum",
+            "index": "apps/stratum/src/index.html",
+            "main": "apps/stratum/src/main.ts",
+            "polyfills": "apps/stratum/src/polyfills.ts",
+            "tsConfig": "apps/stratum/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "apps/stratum/src/favicon.ico",
+              "apps/stratum/src/assets"
+            ],
+            "styles": ["apps/stratum/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/stratum/src/environments/environment.ts",
+                  "with": "apps/stratum/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "stratum:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "stratum:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "stratum:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/stratum/tsconfig.app.json",
+              "apps/stratum/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/stratum/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/stratum/jest.config.js",
+            "tsConfig": "apps/stratum/tsconfig.spec.json",
+            "passWithNoTests": true,
+            "setupFile": "apps/stratum/src/test-setup.ts"
+          }
+        }
+      }
+    },
+    "stratum-e2e": {
+      "root": "apps/stratum-e2e",
+      "sourceRoot": "apps/stratum-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/stratum-e2e/cypress.json",
+            "tsConfig": "apps/stratum-e2e/tsconfig.e2e.json",
+            "devServerTarget": "stratum:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "stratum:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["apps/stratum-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/stratum-e2e/**"]
+          }
+        }
+      }
     }
   },
   "cli": {
@@ -394,6 +517,13 @@
       "library": {
         "linter": "eslint"
       }
+    },
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "jest"
     }
   },
   "defaultProject": "clades"
