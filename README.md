@@ -118,6 +118,40 @@ Then, all of the four tests pass.
 
 An improvement for this headache is to create a test ngrx module that does all that and then import that in any spec file that references Store.  Put this on the list of things to do.
 
+### Use the NgRx MockStore
+
+Import the required libs, a MockStore object, configure the test bed with an initial state, then confirm that the initial state is what is expected.
+
+```TypeScript
+import { Store, StoreModule } from '@ngrx/store';
+import { provideMockStore, MockStore } from '@ngrx/store/testing';
+describe('CounterComponent', () => {
+  let component: CounterComponent;
+  let fixture: ComponentFixture<CounterComponent>;
+  let store: MockStore;
+  const initialState = { count: 0 };
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [StoreModule.forRoot({})],
+      declarations: [ CounterComponent ],
+      providers: [Store, provideMockStore({ initialState })]
+    })
+    .compileComponents();
+    store = TestBed.inject(MockStore);
+  }));
+  it('counter should start at 0',  done => {
+    component.count$.subscribe( count => {
+      expect(count).toEqual(0);
+      done();
+    });
+  });
+});
+```
+
+In this case, the count is 0, and we have the basics of testing a value from the store using the done => { } callback.
+
+Next we will want to test the increment, decrement and reset actions.
+
 ## Implementing the counter example from the official docs
 
 Trying this our on the counter example form the official docs.
