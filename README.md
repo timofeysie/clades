@@ -39,6 +39,85 @@ ng affected:e2e # run e2e tests for current changes
 
 The docs start off with testing a fictional auth component.  Lets apply the mock store to the counter example.
 
+```bash
+nx test stratum --watch
+```
+
+### Fix the failing tests
+
+After adding the counter code, we will see an error like this on first run:
+
+```bash
+  ● AppComponent › should render title
+    Template parse errors:
+    'clades-counter' is not a known element:
+```
+
+Since the app.module.ts has the CounterComponent in it's provider array, the test must also include that in it's provider array.
+
+The next failure will then be this:
+
+```bash
+    NullInjectorError: StaticInjectorError(DynamicTestModule)[CounterComponent -> Store]:
+      StaticInjectorError(Platform: core)[CounterComponent -> Store]:
+        NullInjectorError: No provider for Store!
+```
+
+The obvious solution would be to add Store to the imports array of the unit spec.  But actually, since the Store is used in the class like this"
+
+```TypeScript
+constructor(private store: Store<{ count: number }>) {
+```
+
+For things injected like this, the test also has to have a provider array which includes Store, like this:
+
+```TypeScript
+TestBed.configureTestingModule({
+  imports: [RouterTestingModule],
+  declarations: [AppComponent, CounterComponent],
+  providers: [Store]
+}).compileComponents();
+```
+
+However, this is not enough.  After this we will see this failure:
+
+```bash
+● AppComponent › should create the app
+  NullInjectorError: StaticInjectorError(DynamicTestModule)[Store -> StateObservable]:
+    StaticInjectorError(Platform: core)[Store -> StateObservable]:
+      NullInjectorError: No provider for StateObservable!
+```
+
+What we need to fix this is the StoreModule
+
+```TypeScript
+TestBed.configureTestingModule({
+  imports: [RouterTestingModule, StoreModule.forRoot({})],
+```
+
+The next failure will be the new component with this message:
+
+```bash
+● CounterComponent › should create
+  NullInjectorError: StaticInjectorError(DynamicTestModule)[CounterComponent -> Store]:
+    StaticInjectorError(Platform: core)[CounterComponent -> Store]:
+      NullInjectorError: No provider for Store!
+```
+
+Since the automatically generated test has no imports or providers array, we need to create those ourselves like this:
+
+```TypeScript
+TestBed.configureTestingModule({
+  imports: [StoreModule.forRoot({})],
+  declarations: [ CounterComponent ],
+  providers: [Store]
+})
+```
+
+Then, all of the four tests pass.
+
+An improvement for this headache is to create a test ngrx module that does all that and then import that in any spec file that references Store.  Put this on the list of things to do.
+
 ## Implementing the counter example from the official docs
 
 Trying this our on the counter example form the official docs.
