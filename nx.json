@@ -48,6 +48,13 @@
     "stratum-e2e": {
       "tags": [],
       "implicitDependencies": ["stratum"]
+    },
+    "stromatolites": {
+      "tags": []
+    },
+    "stromatolites-e2e": {
+      "tags": [],
+      "implicitDependencies": ["stromatolites"]
     }
   }
 }

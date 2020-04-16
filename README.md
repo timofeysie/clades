@@ -23,7 +23,9 @@ Project scripts reference.
 nx serve api # serve the API backend
 nx serve monophyletic # serve the React front end
 nx serve stratum # Angular app with unit tests for the counter example
-nx test stratum --watch ## run Angular Jest unit tests
+nx serve stromatolites # Angular app for the updated Duncan workshop code
+nx test stratum --watch # run Angular Jest unit tests
+nx test stromatolites --watch
 nx dep-graph # show the dependency graph
 nx affected:dep-graph # show the deo-graph with updates needed
 ng g @nrwl/angular:lib ui # Generate UI lib
@@ -32,6 +34,25 @@ nx dep-graph # open the dependency graph
 ng affected:dep-graph # see what's been affected by changes
 ng affected:test # run tests for current changes
 ng affected:e2e # run e2e tests for current changes
+```
+
+## Re-implementing the Duncan
+
+As the code from the  GitBook: [Workshop: Enterprise Angular applications with NgRx and Nx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/) is over two years old now, this is a tentative step by step implementation of the same code but using a currently generated nx workspace.
+
+Note the section numbers and the step numbers used here are not the same.
+
+### Workshop Step 1: creating the Angular app
+
+```bash
+nx generate @nrwl/angular:app stromatolites
+```
+
+The workflow commands now are:
+
+```bash
+nx serve stromatolites
+nx test stromatolites
 ```
 
 ## Testing NgRx
@@ -510,7 +531,8 @@ After this, in the Chrome inspector/Redux tab, we see the actions working on the
 
 ## NgRx counter example
 
-[Example overview](https://ngrx.io/guide/store#tutorial) of steps required.
+Here is a brief walk through of the tutorial example from the official NgRx docs.
+[The counter tutorial is briefly explained with](https://ngrx.io/guide/store#tutorial) some code.  I have broken it down into four steps.0
 
 1. Define actions to express events.
 2. Define a reducer function to manage the state of the counter.
@@ -576,11 +598,27 @@ In the Duncan Hunter workshop, the name was customer-portal, we will be creating
 ng g application stromatolites --style=scss --routing --prefix=app
 ```
 
+```bash
+>ng g application stromatolites --style=scss --routing --prefix=app
+The generate command requires to be run in an Angular project, but a project definition could not be found.
+```
+
+The current docs show this CLI command to create an Angular app (notice it says node, not angular):
+
+```bash
+nx generate @nrwl/node:app stromatolites
+```
+
+Despite what the docs say, this will indeed create an NodeJS app.  To create an Angular app, you do need to say 'angular' to the CLI:
+
+```bash
+nx generate @nrwl/angular:app stromatolites
+```
+
 Notes from the [official docs](https://nx.dev/angular/tutorial/01-create-application) show the method using npx and the CLI to answer these questions.
 
 ```bash
 npx create-nx-workspace@latest
-
 ? Workspace name (e.g., org name)     myorg
 ? What to create in the new workspace angular
 ? Application name                    todos
@@ -592,6 +630,15 @@ When creating the first React app for this repo, this was also needed:
 ```bash
 npm i @nrwl/workspace
 ```
+
+The workflow commands now are:
+
+```bash
+nx serve stromatolites
+nx run stromatolites:serve
+```
+
+They are equivalent commands.
 
 ### Issues with creating a new app
 
