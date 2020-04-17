@@ -17,7 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@clades/ui-header": ["libs/ui-header/src/index.ts"],
-      "@clades/api-interface": ["libs/api-interface/src/index.ts"]
+      "@clades/api-interface": ["libs/api-interface/src/index.ts"],
+      "@clades/auth": ["libs/auth/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

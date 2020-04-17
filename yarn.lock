@@ -1411,6 +1411,16 @@
     merge-source-map "^1.1.0"
     schema-utils "^2.6.4"
 
+"@ngrx/effects@^9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/effects/-/effects-9.1.0.tgz#b977780ce9e58632ae8e2f259741a3861bbbbfe4"
+  integrity sha512-DPMtp/2YTrvuxMqaehQ39FeoNODuMcRB6xDImvrnMFPIkUcP3mDHnIg6UB5c2JvfHlZZClKR+Fb+RE2nuVub8w==
+
+"@ngrx/router-store@^9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/router-store/-/router-store-9.1.0.tgz#e8e72167813746c08b02cb6616c32fb8e0b87385"
+  integrity sha512-zdIBUsfyrrA64mUqajHMARSwttOAOJ5FSyVJLHQfBlz9/vil6Kby1KhVLEG7mGmkz799YYlIM135QsrJhgf7wA==
+
 "@ngrx/store-devtools@^9.1.0":
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/@ngrx/store-devtools/-/store-devtools-9.1.0.tgz#503f6468454bb633433408884b99377716f9d884"
@@ -1522,6 +1532,11 @@
     webpack-dev-server "3.9.0"
     webpack-merge "4.2.1"
     webpack-node-externals "1.7.2"
+
+"@nrwl/nx@^7.8.7":
+  version "7.8.7"
+  resolved "https://registry.yarnpkg.com/@nrwl/nx/-/nx-7.8.7.tgz#a85dc5ab30d33ac6cc2234bbc51e229ad85b9b9b"
+  integrity sha512-a/pOozIT86IIWue6MSwN2EKO4grJ8My7QMl+g535/vrDg75riyBTkWF+nX6VM/JjGz40Y5nFZaX94924cZWt5g==
 
 "@nrwl/react@9.2.2":
   version "9.2.2"

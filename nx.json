@@ -55,6 +55,9 @@
     "stromatolites-e2e": {
       "tags": [],
       "implicitDependencies": ["stromatolites"]
+    },
+    "auth": {
+      "tags": []
     }
   }
 }

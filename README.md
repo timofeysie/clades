@@ -45,7 +45,22 @@ Note the section numbers and the step numbers used here are not the same.
 ### Workshop Step 1: creating the Angular app
 
 ```bash
-nx generate @nrwl/angular:app stromatolites
+nx generate @nrwl/angular:app stromatolites --routing
+? Which stylesheet format would you like to use? SASS(.scss)  [ http://sass-lang.com   ]
+CREATE libs/auth/README.md (132 bytes)
+CREATE libs/auth/tsconfig.lib.json (408 bytes)
+CREATE libs/auth/tsconfig.lib.prod.json (97 bytes)
+CREATE libs/auth/tslint.json (244 bytes)
+CREATE libs/auth/src/index.ts (35 bytes)
+CREATE libs/auth/src/lib/auth.module.ts (268 bytes)
+CREATE libs/auth/src/lib/auth.module.spec.ts (338 bytes)
+CREATE libs/auth/tsconfig.json (123 bytes)
+CREATE libs/auth/jest.config.js (345 bytes)
+CREATE libs/auth/tsconfig.spec.json (233 bytes)
+CREATE libs/auth/src/test-setup.ts (30 bytes)
+UPDATE workspace.json (20717 bytes)
+UPDATE nx.json (1174 bytes)
+UPDATE tsconfig.json (691 bytes)
 ```
 
 The workflow commands now are:
@@ -53,6 +68,211 @@ The workflow commands now are:
 ```bash
 nx serve stromatolites
 nx test stromatolites
+```
+
+Commit: [Workshop Step 1: creating the Angular app](https://github.com/timofeysie/clades/issues/3).
+
+[Original Workshop line](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/2-creating-an-nx-workspace)
+
+### Workshop Step 2: Generate the auth lib
+
+This command generates an Angular lib project:
+
+```bash
+nx generate @nrwl/angular:lib auth --routing
+```
+
+The previous command from the workshop was:
+
+```bash
+ng g lib auth --routing --prefix=app --parent-module=apps/stromatolites/src/app/app.module.ts
+```
+
+The updated version is:
+
+```bash
+nx generate lib auth --routing --prefix=app --parent-module=apps/stromatolites/src/app/app.module.ts
+Could not match option 'routing' to the @nrwl/web:library schema.
+Could not match option 'prefix' to the @nrwl/web:library schema.
+Could not match option 'parentModule' to the @nrwl/web:library schema.
+```
+
+Trying this solution first:
+
+```bash
+yarn add @nrwl/web
+```
+
+This doesn't work.  So those options don't exist anymore.  There are no questions asked during the generation now:
+
+```bash
+nx generate lib auth
+CREATE libs/auth/tslint.json (97 bytes)
+CREATE libs/auth/README.md (162 bytes)
+CREATE libs/auth/tsconfig.json (123 bytes)
+CREATE libs/auth/tsconfig.lib.json (172 bytes)
+CREATE libs/auth/src/index.ts (28 bytes)
+CREATE libs/auth/src/lib/auth.ts (0 bytes)
+CREATE libs/auth/jest.config.js (232 bytes)
+CREATE libs/auth/tsconfig.spec.json (273 bytes)
+UPDATE tsconfig.json (691 bytes)
+UPDATE workspace.json (20555 bytes)
+UPDATE nx.json (1174 bytes)
+```
+
+### Workshop step 3: Generate login container
+
+These were the previous commands tried:
+
+```bash
+ng g c containers/login --project=auth
+ng g c containers/login --project=auth --skip-import
+```
+
+Substituting nx for ng and:
+
+```bash
+> ng c containers/login --project=auth
+Schematic "c" not found in collection "@nrwl/web".
+```
+
+Therefore the abbreviated version aren't available using nx.
+
+```bash
+nx generate @nrwl/angular:component containers/login --project=auth --skip-import
+nx generate @nrwl/angular:component components/login-form --project=auth --skip-import
+```
+
+But when it comes time for the next step "Add a default route", there is no ```libs/auth/src/auth.module.ts``` file to add to.
+
+[Source](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/3-generating-components-and-nx-lib)
+
+It seems like they skipped the Angular module part.  There these files, but the first one exports the empty second one.
+
+```bash
+libs\auth\src\index.ts
+libs\auth\src\lib\auth.ts
+```
+
+So is there an extra flag now to create a lib with an Angular .module.ts file?
+
+We would have done something like this in the monophyletic project.
+
+```bash
+ng g @nrwl/angular:lib ui
+```
+
+So do we need something like this?
+
+```bash
+nx generate @nrwl/angular:lib auth
+```
+
+We have already committed the auth module.  Can --force the changes?
+
+This is what was run:
+
+```bash
+nx generate lib auth
+```
+
+This is what we needed:
+
+```bash
+nx generate @nrwl/angular:lib auth --force:true
+```
+
+Options are:
+
+```bash
+Options:
+  --name                  Library name
+  --directory             A directory where the lib is placed
+  --publishable           Generate a buildable library.
+  --prefix                The prefix to apply to generated selectors.
+  --skipFormat            Skip formatting files
+  --simpleModuleName      Keep the module name simple (when using --directory)
+  --skipPackageJson       Do not add dependencies to package.json.
+  --skipTsConfig          Do not update tsconfig.json for development experience.
+  --style                 The file extension to be used for style files. (default: css)
+  --routing               Add router configuration. See lazy for more information.
+  --lazy                  Add RouterModule.forChild when set to true, and a simple array of routes when set to false.
+  --parentModule          Update the router configuration of the parent module using loadChildren or children, depending on what `lazy` is set to.
+  --tags                  Add tags to the library (used for linting)
+  --unitTestRunner        Test runner to use for unit tests (default: jest)
+  --dryRun                undefined
+  --help                  Show available options for project target.
+```
+
+### Workshop step 4: Configure the Auth module
+
+Import the new lib module into the project that will use it, in this case stromatolites.
+
+```js
+import { authRoutes, AuthModule } from '@clades/auth';
+```
+
+Add AuthModule to the imports array.
+
+After this there was still one error in app.module.ts file:
+
+```bash
+Cannot find module '@nrwl/nx'.ts(2307)
+```
+
+Doing this will fix that:
+
+```bash
+yarn add @nrwl/nx
+```
+
+Now run the app:
+
+```bash
+nx serve stromatolites
+ERROR in The target entry-point "@nrwl/nx" has missing dependencies:
+ - @ngrx/effects
+ - @ngrx/router-store
+```
+
+Adding those two dependencies like adding nx fixes the build and the app should run.
+
+Next, test the app:
+
+```bash
+nx test stromatolites --watch
+```
+
+The tests should also pass as we haven't introduced any extra dependencies into the frontend project yet.
+
+#### Configure presentational components
+
+Add presentational component to container component
+
+Add a login function to support the login action.
+
+We have to change app-login to clades-login in the selector for the login.component.
+
+#### The data-models lib
+
+Add new folder for shared interfaces called data-models.  The docs say to add this "manually in the libs folder".  There were problems with this in the Quallasyuyu project, so going with the CLI lib creation method for now.
+
+In that project we ran this command:
+
+```bash
+ng g lib data // create shared interfaces
+```
+
+One way would be to create another Angular library:
+
+```bash
+nx generate @nrwl/angular:lib data-models --force:true
+```
+
+But in this case we don't need it to be Angular.  It would be nice to also use this in a React project at some point, so this is the simplest way to go.
+
+```bash
+nx generate lib data-models
 ```
 
 ## Testing NgRx
