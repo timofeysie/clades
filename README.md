@@ -253,7 +253,7 @@ Add a login function to support the login action.
 
 We have to change app-login to clades-login in the selector for the login.component.
 
-#### The data-models lib
+### Workshop step 5: The data-models lib
 
 Add new folder for shared interfaces called data-models.  The docs say to add this "manually in the libs folder".  There were problems with this in the Quallasyuyu project, so going with the CLI lib creation method for now.
 
@@ -273,7 +273,73 @@ But in this case we don't need it to be Angular.  It would be nice to also use t
 
 ```bash
 nx generate lib data-models
+CREATE libs/data-models/tslint.json (97 bytes)
+CREATE libs/data-models/README.md (176 bytes)
+CREATE libs/data-models/tsconfig.json (123 bytes)
+CREATE libs/data-models/tsconfig.lib.json (172 bytes)
+CREATE libs/data-models/src/index.ts (35 bytes)
+CREATE libs/data-models/src/lib/data-models.ts (0 bytes)
+CREATE libs/data-models/jest.config.js (246 bytes)
+CREATE libs/data-models/tsconfig.spec.json (273 bytes)
+UPDATE tsconfig.json (755 bytes)
+UPDATE workspace.json (21511 bytes)
+UPDATE nx.json (1219 bytes)
 ```
+
+The workshop code shows two files added to this new lib:
+
+```js
+libs/data-models/src/authenticate.d.ts
+libs/data-models/index.ts
+```
+
+Since we are using a slightly different approach for these data models by generating a lib with nx, we will have the following equivalent files:
+
+```js
+libs\data-models\src\lib\authenticate.d.ts
+libs\data-models\src\lib\data-models.ts
+```
+
+Out of the box, the auth module can't import the data-models lib:
+
+```js
+import { Authenticate } from '@clades/data-models';
+```
+
+This had a red squiggly under it.  Luckily, this is not my first rodeo, so I closed VSCode and opened it again and the problem was gone.  TypeScript gets a little out of sync when adding new libraries that it then has to validate.
+
+Creating the submit function as an output brings up a naming issue.  This line:
+
+```js
+@Output() submit = new EventEmitter<Authenticate>();
+```
+
+Has this warning:
+
+```js
+In the class "LoginFormComponent", the output property "submit" should not be named or renamed as a native event (no-output-native)tslint(1)
+```
+
+We will think about changing that later.  
+
+Again, the standard or calling custom elements app-x-component now uses the workspace prefix.  So
+
+```html
+<app-login-form>
+```
+
+becomes:
+
+```html
+<clades-login-form>
+```
+
+This is the last part of the workshop part 3.
+
+#### [6. Change the ChangeDetectionStrategy to OnPush](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/3-generating-components-and-nx-lib)
+
+*Now that we are using the presentation and container component pattern and we know that we only need to check the child components for changes if a DOM event or a @Input or @Output passes new primitives or reference values. In this way we can tell Angular not check the whole component tree which can cause performance issues in larger applications.*
+
 
 ## Testing NgRx
 

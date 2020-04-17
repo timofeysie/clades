@@ -607,6 +607,32 @@
           "style": "scss"
         }
       }
+    },
+    "data-models": {
+      "root": "libs/data-models",
+      "sourceRoot": "libs/data-models/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/data-models/tsconfig.lib.json",
+              "libs/data-models/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/data-models/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/data-models/jest.config.js",
+            "tsConfig": "libs/data-models/tsconfig.spec.json",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
