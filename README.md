@@ -26,6 +26,7 @@ nx serve stratum # Angular app with unit tests for the counter example
 nx serve stromatolites # Angular app for the updated Duncan workshop code
 nx test stratum --watch # run Angular Jest unit tests
 nx test stromatolites --watch
+yarn run server # stromatolites server runs on http://localhost:3000
 nx dep-graph # show the dependency graph
 nx affected:dep-graph # show the deo-graph with updates needed
 ng g @nrwl/angular:lib ui # Generate UI lib
@@ -42,7 +43,7 @@ As the code from the  GitBook: [Workshop: Enterprise Angular applications with N
 
 Note the section numbers and the step numbers used here are not the same.
 
-### Workshop Step 1: creating the Angular app
+### Step 1: creating the Angular app
 
 ```bash
 nx generate @nrwl/angular:app stromatolites --routing
@@ -74,7 +75,7 @@ Commit: [Workshop Step 1: creating the Angular app](https://github.com/timofeysi
 
 [Original Workshop line](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/2-creating-an-nx-workspace)
 
-### Workshop Step 2: Generate the auth lib
+### Step 2: Generate the auth lib
 
 This command generates an Angular lib project:
 
@@ -120,7 +121,7 @@ UPDATE workspace.json (20555 bytes)
 UPDATE nx.json (1174 bytes)
 ```
 
-### Workshop step 3: Generate login container
+### step 3: Generate login container
 
 These were the previous commands tried:
 
@@ -204,7 +205,7 @@ Options:
   --help                  Show available options for project target.
 ```
 
-### Workshop step 4: Configure the Auth module
+### Step 4: Configure the Auth module
 
 Import the new lib module into the project that will use it, in this case stromatolites.
 
@@ -253,7 +254,7 @@ Add a login function to support the login action.
 
 We have to change app-login to clades-login in the selector for the login.component.
 
-### Workshop step 5: The data-models lib
+### Step 5: The data-models lib
 
 Add new folder for shared interfaces called data-models.  The docs say to add this "manually in the libs folder".  There were problems with this in the Quallasyuyu project, so going with the CLI lib creation method for now.
 
@@ -340,6 +341,57 @@ This is the last part of the workshop part 3.
 
 *Now that we are using the presentation and container component pattern and we know that we only need to check the child components for changes if a DOM event or a @Input or @Output passes new primitives or reference values. In this way we can tell Angular not check the whole component tree which can cause performance issues in larger applications.*
 
+The app serves without errors, and all the tests pass.
+
+### Workshop part 4 - Add JSON server
+
+I have mixed feelings on this step.  On the one hand, a simple NodeJS Express app would only take a little bit more time.  On the other hand, this could just be a front end only workshop, in which case, that is wasting people's time.
+
+From the front end point of view, a step involving setting up AWS Cognito, Azure B2C, or even Firebase would be an improvement.  Maybe optional modules would be a good idea.
+
+Anyhow, this is how it's done in the current workshop:
+
+```bash
+npm i json-server ts-node --save-dev
+yarn add json-server ts-node --save-dev
+```
+
+#### 4.2. Make a server.ts file in a new folder called server
+
+Make a new folder called server and file called server.ts in the new server folder.
+
+The db file mixes users and products, which is not ideal.  The products need to be changed to items.
+
+This will be the start of our divergence from the products example into a user designed model.
+
+I will show what the products are, but provide an implementation for a different data model that is more useful for me.  In my case, I want a list of categories and items in each category.
+
+We will add strong typing between the server and the client in a later step.
+
+To be honest, I'm still undecided about the exact shape of the items list.  The current approach is to put all the items in one list with a category property.  The category will provide filtering.  Maybe this is the best way to go, or maybe we want separate category lists?  Not sure yet.  So for now, the products stay as they are.
+
+#### 4. Add the below script to the scripts in the package.json
+
+For now, just run the server and move on:
+
+```bash
+npm run server
+yarn run server # live on http://localhost:3000
+```
+
+### Step 6: the auth service
+
+#### [5 - Angular Services](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/5-angular-services)
+
+The old workshop scaffolding command:
+
+```bash
+ng g service services/auth/auth --project=auth
+```
+
+```bash
+nx generate @nrwl/angular:service services/auth/auth --project=auth --skip-import
+```
 
 ## Testing NgRx
 
