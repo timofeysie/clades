@@ -405,11 +405,13 @@ libs/auth/src/lib/services/auth/auth.service.ts
 
 #### 5.3 Update Login component to call the service
 
+Now the login can be tested somewhat.  Go to: http://localhost:4200/auth/login and open the networks tab in the inspector.
+
 Test credentials would be:
 
 ```text
-username: admin
-username: Duncan (non admin user)
+username: admin (admin, duh!)
+username: duncan (non admin user)
 password: 123
 ```
 
@@ -417,6 +419,96 @@ password: 123
 nx serve stromatolites # Angular app for the updated Duncan workshop code
 nx test stromatolites --watch # run Angular Jest unit tests
 ```
+
+### Workshop step 7: create a lib to hold all the Angular Material imports
+
+This step will generate an Nx lib to hold all the common material components uses in the workspace apps.
+
+#### [6 - Angular Material](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/6-angular-material)
+
+```bash
+npm install @angular/material @angular/cdk @angular/flex-layout @angular/animations
+yarn add @angular/material @angular/cdk @angular/flex-layout @angular/animations
+```
+
+Add animations module to the main app module.
+
+#### **`src/app/app.module.ts`**
+
+```js
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+...
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    ...
+```
+
+#### 6.2. Add a new Nx lib to hold all the common material components we will use in our apps
+
+The workshop command:
+
+```bash
+ng g lib material
+```
+
+The updated lib creation nx command:
+
+```bash
+nx generate @nrwl/angular:lib material
+CREATE libs/material/README.md (140 bytes)
+CREATE libs/material/tsconfig.lib.json (408 bytes)
+CREATE libs/material/tsconfig.lib.prod.json (97 bytes)
+CREATE libs/material/tslint.json (244 bytes)
+CREATE libs/material/src/index.ts (39 bytes)
+CREATE libs/material/src/lib/material.module.ts (163 bytes)
+CREATE libs/material/src/lib/material.module.spec.ts (358 bytes)
+CREATE libs/material/tsconfig.json (123 bytes)
+CREATE libs/material/jest.config.js (353 bytes)
+CREATE libs/material/tsconfig.spec.json (233 bytes)
+CREATE libs/material/src/test-setup.ts (30 bytes)
+UPDATE workspace.json (22447 bytes)
+UPDATE nx.json (1261 bytes)
+UPDATE tsconfig.json (813 bytes)
+```
+
+There are some breaking changes in the way material imports are done.  This was the error from the Quallasuyu project:
+
+```bash
+ERROR in libs/material/src/lib/material.module.ts(16,8): error TS2306: File 'C:/Users/timof/repos/timofeysie/quallasuyu/node_modules/@angular/material/index.d.ts' is not a module.
+```
+
+Thanks to [this SO answer](https://stackoverflow.com/questions/58594311/angular-material-index-d-ts-is-not-a-module), we know that it's a Angular 9 breaking change probably for tree shaking purposes.  So instead of doing a single line import with stuff like this:
+
+```bash
+import {
+  ...
+  MatSelectModule
+} from '@angular/material';
+```
+
+We have to do this:
+
+```bash
+...
+import { MatSelectModule } from '@angular/material/select';
+```
+
+Next, Add material module to auth module
+
+#### **`libs/auth/src/auth.module.ts`**
+
+```js
+import { MaterialModule } from '@clades/material';
+```
+
+And add it to the imports array as usual.
+
+#### 6.3. Add material default styles
+
+Update the login-form to use material components, and this section is done.
+
+Duncan provides a [link for material demos here](https://tburleson-layouts-demos.firebaseapp.com/#/docs).  Now the app runs, looks OK, and all the tests are still passing.
 
 ## Testing NgRx
 
