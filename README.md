@@ -420,7 +420,7 @@ nx serve stromatolites # Angular app for the updated Duncan workshop code
 nx test stromatolites --watch # run Angular Jest unit tests
 ```
 
-### Workshop step 7: create a lib to hold all the Angular Material imports
+### Step 7: create a lib to hold all the Angular Material imports
 
 This step will generate an Nx lib to hold all the common material components uses in the workspace apps.
 
@@ -509,6 +509,81 @@ And add it to the imports array as usual.
 Update the login-form to use material components, and this section is done.
 
 Duncan provides a [link for material demos here](https://tburleson-layouts-demos.firebaseapp.com/#/docs).  Now the app runs, looks OK, and all the tests are still passing.
+
+### Step 8: Reactive Forms and User interface
+
+The work for this section is connected [to this issue](https://github.com/timofeysie/clades/issues/9) and it's associated commits.
+
+#### Original source: part [7 - Reactive Forms](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/7-reactive-forms)
+
+7.1. Add ReactiveFormsModule to Auth module
+
+#### **`libs/auth/src/lib/auth.module.ts`**
+
+libs/auth/src/lib/components/login-form/login-form.component.ts
+
+```bash
+import { ReactiveFormsModule } from '@angular/forms';  // Added
+...
+```
+
+The reactive form looks something like this:
+
+#### **`libs/auth/src/lib/components/login-form/login-form.component.ts`**
+
+```js
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+...
+  loginForm = new FormGroup({
+    username: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required])
+  });
+
+  login() {
+    this.submit.emit({
+      username: this.loginForm.value.username,
+      password: this.loginForm.value.password
+    } as Authenticate);
+  }
+```
+
+#### **`libs/auth/src/lib/components/login-form/login-form.component.html`***
+
+Reactive forms do a good job of keeping track of the form state, almost like a mini-Redux style state management feature inside of Angular.  This makes validation of inputs pretty easy:
+
+```html
+<form [formGroup]="loginForm" fxLayout="column" fxLayoutAlign="center none">
+  <mat-form-field>
+    <input
+      matInput
+      placeholder="username"
+      type="text"
+      formControlName="username"
+    />
+    <mat-error>
+      <span
+        *ngIf="
+          loginForm.get('username').hasError('required') &&
+          loginForm.touched"
+        >Required Field</span
+      >
+    </mat-error>
+  </mat-form-field>
+  ...
+```
+
+Room for improvement here would be an array or error messages in the class itself, or some other method for managing all those messages in one place.  I suppose them being located where they are actually used, but the more structure you impose on an enterprise level application, the more these things are automated or even coming from the server, and so a centrally located source for these messages makes a lot of sense, which is why it's usually done.
+
+This would be a good segway into what an enterprise level validation messaging system looks like.  Add that to the list of potential things to do.
+
+### Step 9 The User interface
+
+4. Add a User interface
+
+nx serve stromatolites # Angular app for the updated Duncan workshop code
+nx test stromatolites --watch
+yarn run server
+
 
 ## Testing NgRx
 
