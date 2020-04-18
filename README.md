@@ -389,8 +389,33 @@ The old workshop scaffolding command:
 ng g service services/auth/auth --project=auth
 ```
 
+The updated nx command:
+
 ```bash
 nx generate @nrwl/angular:service services/auth/auth --project=auth --skip-import
+CREATE libs/auth/src/lib/services/auth/auth.service.spec.ts (347 bytes)
+CREATE libs/auth/src/lib/services/auth/auth.service.ts (133 bytes)
+```
+
+#### 5.2 Add HttpClientModule to Auth Module
+
+libs/auth/src/lib/auth.module.ts
+
+libs/auth/src/lib/services/auth/auth.service.ts
+
+#### 5.3 Update Login component to call the service
+
+Test credentials would be:
+
+```text
+username: admin
+username: Duncan (non admin user)
+password: 123
+```
+
+```bash
+nx serve stromatolites # Angular app for the updated Duncan workshop code
+nx test stromatolites --watch # run Angular Jest unit tests
 ```
 
 ## Testing NgRx
