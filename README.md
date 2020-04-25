@@ -547,7 +547,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   }
 ```
 
-#### **`libs/auth/src/lib/components/login-form/login-form.component.html`***
+#### **`libs/auth/src/lib/components/login-form/login-form.component.html`**
 
 Reactive forms do a good job of keeping track of the form state, almost like a mini-Redux style state management feature inside of Angular.  This makes validation of inputs pretty easy:
 
@@ -576,14 +576,119 @@ Room for improvement here would be an array or error messages in the class itsel
 
 This would be a good segway into what an enterprise level validation messaging system looks like.  Add that to the list of potential things to do.
 
-### Step 9 The User interface
+### Step 9 The User date model interface
 
-4. Add a User interface
+This will go in the data-models lib and be used in auth.service.ts, layout.component.ts, auth actions, effects and reducers.
 
-nx serve stromatolites # Angular app for the updated Duncan workshop code
-nx test stromatolites --watch
+#### Original source: part [7 - Reactive Forms](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/7-reactive-forms).4: Add a User interface
+
+#### **`libs/data-models/user.d.ts`**
+
+```js
+export interface User {
+  username: string;
+  id: number;
+  country: string;
+  token: string;
+  role: string;
+}
+```
+
+The auth service API call will use the interface twice to confirm what is returned from the result.
+
+#### **`libs\auth\src\lib\services\auth\auth.service.ts`**
+
+```js
+login(authenticate: Authenticate): Observable<User> {
+  return this.httpClient.post<User>('http://localhost:3000/login', authenticate);
+}
+```
+
+### Step 10: The Layout lib
+
+#### Original source: part [8 - Layout Lib and BehaviorSubjects](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/8-layout-lib-and-behaviorsubjects)
+
+For this lib, we also want a Angular specific component library, so that is the schema used in the command.
+
+nx generate @nrwl/angular:lib layout
+
+The legacy workshop generation commands use a prefix of "app".  Without this flag, we get the workspace name, which seems like a good idea.  So as noted before, the components will be used with the "clades" prefix.
+
+```bash
+ng g lib layout --prefix app
+ng g c containers/layout --project=layout
+```
+
+On area of interest here for a real work scenario might be to use a stencil component library which would work in React and Vue as well.  That would be quite a tangent however.  It's worth noting it here so that if wanted later it can go into any planning for a longer series depending on the skill level of the readers it would be targeting.
+
+#### Fixing the unit tests
+
+It's work running all the tests again, not just the stromatolites app.
+
+The data-models and material libs don't really count.  Material has one passing test, but there are none yet for the data-models.
+
+The auth lib currently has some failing tests.
+
+```bash
+nx test auth --watch
+...
+Tests:       3 failed, 1 passed, 4 total
+```
+
+The first failure is:
+
+```bash
+FAIL  libs/auth/src/lib/services/auth/auth.service.spec.ts
+  ● AuthService › should be created
+    NullInjectorError: StaticInjectorError(DynamicTestModule)[HttpClient]:
+      StaticInjectorError(Platform: core)[HttpClient]:
+        NullInjectorError: No provider for HttpClient!
+```
+
+This is an easy fix as the test just needs its dependencies updated.
+
+```js
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+...
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]});
+      ...
+```
+
+That fixes two of the failures.  The last one is also a missing dependency:
+
+```bash
+FAIL  libs/auth/src/lib/containers/login/login.component.spec.ts
+  ● LoginComponent › should create
+    Template parse errors:
+    'clades-login-form' is not a known element:
+    1. If 'clades-login-form' is an Angular component, then verify that it is part of this module.
+    2. If 'clades-login-form' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message. ("<br />
+```
+
+#### 8.3. Add a BehaviourSubject to Auth service
+
+Todo.
+
+#### Workflow shortcuts
+
+Just a reminder of what needs to be run when working on this project.
+
+```bash
 yarn run server
+nx serve stromatolites
+nx test stromatolites --watch
+nx test auth --watch
+```
 
+#### Potential to do list
+
+Here is a growing list of items that highlight areas of improvement for a potential updated article about how to implement features the use NgRx.
+
+* NodeJS Express app, AWS Cognito, Azure B2C, or Firebase to replace the JSON demo server.
+* Centralize validation error messages as noted in step 8: Reactive Forms and User interface.
+* Use a web components library instead of the Angular specific layout lib created in step 10: The Layout lib.
 
 ## Testing NgRx
 
