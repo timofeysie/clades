@@ -621,6 +621,13 @@ ng g c containers/layout --project=layout
 
 On area of interest here for a real work scenario might be to use a stencil component library which would work in React and Vue as well.  That would be quite a tangent however.  It's worth noting it here so that if wanted later it can go into any planning for a longer series depending on the skill level of the readers it would be targeting.
 
+There are extras at the end of this section which should be done for good measure:
+
+1. Convert Layout component into a pure container component
+
+* Add a toolbar presentational component.
+* Pass user into presentational component via inputs.
+
 #### Fixing the unit tests
 
 It's work running all the tests again, not just the stromatolites app.
@@ -667,7 +674,82 @@ FAIL  libs/auth/src/lib/containers/login/login.component.spec.ts
     2. If 'clades-login-form' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message. ("<br />
 ```
 
-#### 8.3. Add a BehaviourSubject to Auth service
+After a weeks break on this project, running these tests again now shows two failures:
+
+```bash
+nx run auth:test --watch=true
+...
+  ● LoginComponent › should create
+    Unexpected directive 'LoginFormComponent' imported by the module 'DynamicTestModule'. Please add a @NgModule annotation.
+...
+    Template parse errors:
+    'mat-card-title' is not a known element:
+    1. If 'mat-card-title' is an Angular component, then verify that it is part of this module.
+```
+
+The last one requires MaterialModule to be imported by the spec.
+
+After that we see another failure:
+
+```bash
+    Template parse errors:
+    Can't bind to 'formGroup' since it isn't a known property of 'form'. ("
+      <mat-card-title>Login</mat-card-title>
+      <mat-card-content>
+        <form [ERROR ->][formGroup]="loginForm" fxLayout="column" fxLayoutAlign="center none">
+```
+
+This of course requires the forms stuff added to the imports array:
+
+```js
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+```
+
+The next failure:
+
+```bash
+  ● LoginFormComponent › should create
+    Found the synthetic property @transitionMessages. Please include either "BrowserAnimationsModule" or "NoopAnimationsModule" in your application.
+```
+
+That's a weird one.  Since @transitionMessages is not found in the project, it must be part of material which we just imported above.  Stopping and starting the tests and closing and opening VSCode fixes this.  Or, fixes one of them.  Now the only test failing is the @transitionMessages one.
+
+We have BrowserAnimationsModule imported in the app.module.ts file.  [This issue](https://github.com/angular/angular/issues/18751) is still open on the Angular GitHub.
+
+Solution from [this blog](https://onlyangular5.blogspot.com/2018/02/complete-angular-5-tutorial-for.html): *Use (submit) instead of (ngSubmit).*
+
+We don't have a submit in the login form component.  We do have this however:
+
+```js
+@Output() submit = new EventEmitter<Authenticate>();
+```
+
+There is a TypeScript warning on this: *In the class "LoginFormComponent", the output property "submit" should not be named or renamed as a native event (no-output-native)tslint(1)*
+
+That was noticed before.  Changed submit to submitLogin and the warning is gone.  Also imported these in the login.component.spec.ts file, same as the form, and added them to the imports array.
+
+```js
+import { MaterialModule } from '@clades/material';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+```
+
+Now the login component has this failure:
+
+```bash
+NullInjectorError: No provider for HttpClient!
+```
+
+This requires the testing module imported and added to the array:
+
+```js
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+```
+
+Now both login and login-form component specs are failing with the *Found the synthetic property @transitionMessages.*.  Feels like a virus spreading.
+
+Ran *yarn add  @angular/animations* and imported BrowserAnimationsModule into the auth module to see if it would help.  It didn't.
+
+#### 8.3. Add a BehaviorSubject to Auth service
 
 Todo.
 
@@ -1425,13 +1507,13 @@ Next, step 8 - Layout Lib and BehaviorSubjects.
 ```bash
 ng g lib layout --prefix app
 ng g c containers/layout --project=layout
-```
-
 warning Lockfile has incorrect entry for "@angular/flex-layout@^7.0.0". Ignoring it.
 ? Please choose a version of "@angular/flex-layout" from this list: (Use arrow keys)
 The later version 7 choice on the list was 7.0.0-beta-24.  In fact all choices were beta.  If this was for work I would actually look into this a bit more.
+```
 
 Getting the gyp configure error which ends like this:
+
 ```bash
 gyp ERR! stack Error: Command failed: C:\\Windows\\py.exe -c import sys; print \"%s.%s.%s\" % sys.C:\\Users\\timof\\repos\\timofeysie\\quallasuyu\\node_modules\\@angular-devkit\\build-angular\\node_modules\\node-sass
 ```

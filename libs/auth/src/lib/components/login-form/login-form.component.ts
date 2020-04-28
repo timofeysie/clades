@@ -8,7 +8,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./login-form.component.scss']
 })
 export class LoginFormComponent {
-  @Output() submit = new EventEmitter<Authenticate>();
+  @Output() submitLogin = new EventEmitter<Authenticate>();
 
   loginForm = new FormGroup({
     username: new FormControl('', [Validators.required]),
@@ -16,7 +16,7 @@ export class LoginFormComponent {
   });
 
   login() {
-    this.submit.emit({
+    this.submitLogin.emit({
       username: this.loginForm.value.username,
       password: this.loginForm.value.password
     } as Authenticate);
