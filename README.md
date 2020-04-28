@@ -749,6 +749,8 @@ Now both login and login-form component specs are failing with the *Found the sy
 
 Ran *yarn add  @angular/animations* and imported BrowserAnimationsModule into the auth module to see if it would help.  It didn't.
 
+About to give up and imported both MaterialModule and BrowserAnimationsModule in both failing specs and the tests pass!  Finally can move on to the next step, which is?
+
 #### 8.3. Add a BehaviorSubject to Auth service
 
 Todo.

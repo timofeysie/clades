@@ -6,12 +6,20 @@ import { LoginFormComponent } from './components/login-form/login-form.component
 import { HttpClientModule } from '@angular/common/http';
 import { MaterialModule } from '@clades/material';
 import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export const authRoutes: Route[] = [
   { path: 'login', component: LoginComponent }
 ];
 @NgModule({
-  imports: [CommonModule, RouterModule, HttpClientModule, MaterialModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    HttpClientModule,
+    MaterialModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule
+  ],
   declarations: [LoginComponent, LoginFormComponent]
 })
 export class AuthModule {}

@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginFormComponent } from './login-form.component';
 import { MaterialModule } from '@clades/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('LoginFormComponent', () => {
@@ -11,6 +12,7 @@ describe('LoginFormComponent', () => {
     TestBed.configureTestingModule({
       imports: [ 
         MaterialModule, 
+        BrowserAnimationsModule,
         FormsModule,
         ReactiveFormsModule ],
       declarations: [ LoginFormComponent ]
