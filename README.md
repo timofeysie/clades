@@ -610,7 +610,24 @@ login(authenticate: Authenticate): Observable<User> {
 
 For this lib, we also want a Angular specific component library, so that is the schema used in the command.
 
+```bash
 nx generate @nrwl/angular:lib layout
+? Which stylesheet format would you like to use? SASS(.scss)  [ http://sass-lang.com   ]
+CREATE libs/layout/README.md (136 bytes)
+CREATE libs/layout/tsconfig.lib.json (408 bytes)
+CREATE libs/layout/tsconfig.lib.prod.json (97 bytes)
+CREATE libs/layout/tslint.json (244 bytes)
+CREATE libs/layout/src/index.ts (37 bytes)
+CREATE libs/layout/src/lib/layout.module.ts (161 bytes)
+CREATE libs/layout/src/lib/layout.module.spec.ts (348 bytes)
+CREATE libs/layout/tsconfig.json (123 bytes)
+CREATE libs/layout/jest.config.js (349 bytes)
+CREATE libs/layout/tsconfig.spec.json (233 bytes)
+CREATE libs/layout/src/test-setup.ts (30 bytes)
+UPDATE workspace.json (23365 bytes)
+UPDATE nx.json (1301 bytes)
+UPDATE tsconfig.json (867 bytes)
+```
 
 The legacy workshop generation commands use a prefix of "app".  Without this flag, we get the workspace name, which seems like a good idea.  So as noted before, the components will be used with the "clades" prefix.
 
@@ -751,9 +768,25 @@ Ran *yarn add  @angular/animations* and imported BrowserAnimationsModule into th
 
 About to give up and imported both MaterialModule and BrowserAnimationsModule in both failing specs and the tests pass!  Finally can move on to the next step, which is?
 
+### Add a layout container component
+
+Original source: part [8 - Layout Lib and BehaviorSubjects](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/8-layout-lib-and-behaviorsubjects).
+
+To add a layout container component
+
+```bash
+ng g @nrwl/angular:component containers/layout --project ui
+```
+
+The previous command was:
+
+```bash
+ng g c containers/layout --project=layout
+```
+
 #### 8.3. Add a BehaviorSubject to Auth service
 
-Todo.
+
 
 #### Workflow shortcuts
 

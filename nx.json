@@ -64,6 +64,9 @@
     },
     "material": {
       "tags": []
+    },
+    "layout": {
+      "tags": []
     }
   }
 }
