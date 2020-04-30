@@ -21,6 +21,7 @@ Project scripts reference.
 
 ```bash
 nx serve api # serve the API backend
+nx serve luca # React Ionic test app
 nx serve monophyletic # serve the React front end
 nx serve stratum # Angular app with unit tests for the counter example
 nx serve stromatolites # Angular app for the updated Duncan workshop code
@@ -36,6 +37,18 @@ ng affected:dep-graph # see what's been affected by changes
 ng affected:test # run tests for current changes
 ng affected:e2e # run e2e tests for current changes
 ```
+
+## The @nxtend/ionic-react plugin
+
+After failing to create and then run an Ionic React app in the [Quallasuyu project](https://github.com/timofeysie/quallasuyu), using the updated workspace here succeeds using the following commands:
+
+```bash
+yarn add @nxtend/ionic-react
+nx generate @nxtend/ionic-react:application luca
+nx serve luca
+```
+
+This is a demo project to try out the [Ionic/React plugin](https://github.com/devinshoemaker/nxtend) featured in a [recent blog by the NrWl team](https://blog.nrwl.io/computation-caching-out-of-the-box-revamped-docs-community-plugins-and-more-in-nx-9-2-e97801116e02).  No plans yet to develop anything with it.
 
 ## Re-implementing the Duncan
 

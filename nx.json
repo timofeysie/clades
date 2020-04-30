@@ -67,6 +67,13 @@
     },
     "layout": {
       "tags": []
+    },
+    "luca": {
+      "tags": []
+    },
+    "luca-e2e": {
+      "tags": [],
+      "implicitDependencies": ["luca"]
     }
   }
 }
