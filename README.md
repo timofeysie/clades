@@ -775,13 +775,32 @@ Original source: part [8 - Layout Lib and BehaviorSubjects](https://duncanhunter
 To add a layout container component
 
 ```bash
-ng g @nrwl/angular:component containers/layout --project ui
+nx g @nrwl/angular:component  containers/layout --project=layout
+CREATE libs/layout/src/lib/containers/layout/layout.component.html (21 bytes)
+CREATE libs/layout/src/lib/containers/layout/layout.component.spec.ts (628 bytes)
+CREATE libs/layout/src/lib/containers/layout/layout.component.ts (278 bytes)
+CREATE libs/layout/src/lib/containers/layout/layout.component.css (0 bytes)
 ```
 
 The previous command was:
 
 ```bash
 ng g c containers/layout --project=layout
+```
+
+Add the usual imports to the new layout module:
+```js
+import { MaterialModule } from '@<workspace>/material';    // Added
+import { RouterModule } from '@angular/router';   // Added
+```
+
+#### **`libs/layout/src/lib/containers/layout/  layout.component.html`**
+
+```html
+<mat-toolbar color="primary" fxLayout="row">
+  <span>Customer Portal</span>
+</mat-toolbar>
+<ng-content></ng-content>
 ```
 
 #### 8.3. Add a BehaviorSubject to Auth service
@@ -796,7 +815,7 @@ Just a reminder of what needs to be run when working on this project.
 yarn run server
 nx serve stromatolites
 nx test stromatolites --watch
-nx test auth --watch
+nx test layout --watch
 ```
 
 #### Potential to do list
