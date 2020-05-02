@@ -807,7 +807,7 @@ import { MaterialModule } from '@<workspace>/material';    // Added
 import { RouterModule } from '@angular/router';   // Added
 ```
 
-#### **`libs/layout/src/lib/containers/layout/  layout.component.html`**
+#### **`libs/layout/src/lib/containers/layout/layout.component.html`**
 
 ```html
 <mat-toolbar color="primary" fxLayout="row">
@@ -816,9 +816,15 @@ import { RouterModule } from '@angular/router';   // Added
 <ng-content></ng-content>
 ```
 
-#### 8.3. Add a BehaviorSubject to Auth service
+After this, we see this error:
 
+```bash
+apps/stromatolites/src/app/app.component.html:1:1 - error NG8001: 'clades-layout' is not a known element:
+```
 
+I don't get it.  The clades-layout component is imported and declared in the LayoutModule which is imported into the stromatolites app.module, so it should be available to any component there, shouldn't it?
+
+Not sure what is going on.  To debug this issue, I will create a new layout module and got step by step again using progressive enhancement to apply the changes.  Making a commit now to start with a clean slate.
 
 #### Workflow shortcuts
 
