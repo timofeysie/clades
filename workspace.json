@@ -800,6 +800,38 @@
           }
         }
       }
+    },
+    "abc-layout": {
+      "projectType": "library",
+      "root": "libs/abc-layout",
+      "sourceRoot": "libs/abc-layout/src",
+      "prefix": "app",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/abc-layout/tsconfig.lib.json",
+              "libs/abc-layout/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/abc-layout/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/abc-layout/jest.config.js",
+            "tsConfig": "libs/abc-layout/tsconfig.spec.json",
+            "passWithNoTests": true,
+            "setupFile": "libs/abc-layout/src/test-setup.ts"
+          }
+        }
+      },
+      "schematics": {
+        "@nrwl/angular:component": {
+          "style": "scss"
+        }
+      }
     }
   },
   "cli": {

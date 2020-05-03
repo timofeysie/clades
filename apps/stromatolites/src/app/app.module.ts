@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { authRoutes, AuthModule } from '@clades/auth';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { LayoutModule } from '@clades/layout';
+import { AbcLayoutModule } from '@clades/abc-layout';
 
 @NgModule({
   declarations: [AppComponent],
@@ -15,7 +16,8 @@ import { LayoutModule } from '@clades/layout';
     NxModule.forRoot(),
     RouterModule.forRoot([{path: 'auth', children: authRoutes}], { initialNavigation: 'enabled' }),
     AuthModule,
-    LayoutModule
+    LayoutModule,
+    AbcLayoutModule
   ],
   providers: [],
   bootstrap: [AppComponent]

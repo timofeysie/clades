@@ -826,6 +826,58 @@ I don't get it.  The clades-layout component is imported and declared in the Lay
 
 Not sure what is going on.  To debug this issue, I will create a new layout module and got step by step again using progressive enhancement to apply the changes.  Making a commit now to start with a clean slate.
 
+#### Debugging issue #13
+
+Creating a new lib, this time with a different prefix but with everything else similar to *Step 10: The Layout lib* (original source: part [8 - Layout Lib and BehaviorSubjects](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/8-layout-lib-and-behaviorsubjects))
+
+```bash
+nx generate @nrwl/angular:lib abc-layout --prefix app
+```
+
+Generate the component:
+
+```bash
+nx g @nrwl/angular:component  containers/layout --project=abc-layout
+```
+
+Add the new module to the stromatolites app.module.ts file:
+
+#### **`apps\stromatolites\src\app\app.module.ts`**
+
+```js
+import { AbcLayoutModule } from '@clades/abc-layout';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    ...
+    AbcLayoutModule
+  ],
+```
+
+No errors here.  But, adding the tag to the app.component.html file shows the same error:
+
+```html
+<app-layout></app-layout>
+```
+
+The full error from the terminal:
+
+```bash
+: Compiled successfully.
+    ERROR in apps/stromatolites/src/app/app.component.html:1:1 - error NG8001: 'app-layout' is not a known element:
+    1. If 'app-layout' is an Angular component, then verify that it is part of this module.
+    2. If 'app-layout' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.
+    1 <app-layout></app-layout>
+      ~~~~~~~~~~~~~~~~~~~~~~~~~
+      apps/stromatolites/src/app/app.component.ts:5:16
+        5   templateUrl: './app.component.html',
+                         ~~~~~~~~~~~~~~~~~~~~~~
+        Error occurs in the template of component AppComponent.
+```
+
+At lest it can be shown that it is not anything to do with the changes made to add the layout functionality and fix the unit tests.  This is happening out of the box which indicates a nrwl or nx issue.
+
 #### Workflow shortcuts
 
 Just a reminder of what needs to be run when working on this project.
