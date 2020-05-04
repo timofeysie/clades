@@ -115,6 +115,14 @@ nx test stratum --watch # run Angular Jest unit tests
 nx e2e stratum-e2e --watch # run the end to end tests
 ```
 
+## Testing a chain of actions
+
+To test a series of actions chained in one way or another, we can use the unit/integration testing format by attaching a spinner, making an async call, then doing some calculation on the result then stopping the spinner.
+
+If the initial async call is displayed in the ui, then we can test all the states and their results via basic unit tests without having to delve into Cypress.
+
+However, if there were chained actions underneath the skin, so to speak, how would we test that?  That might require the observable actions that trigger when a certain action is called, such as "GET_ITEM_SUCCESS".
+
 ## The @nxtend/ionic-react plugin
 
 After failing to create and then run an Ionic React app in the [Quallasuyu project](https://github.com/timofeysie/quallasuyu), using the updated workspace here succeeds using the following commands:
@@ -738,7 +746,7 @@ There are extras at the end of this section which should be done for good measur
 
 #### Fixing the unit tests
 
-It's work running all the tests again, not just the stromatolites app.
+It's worth running all the tests again, not just the stromatolites app.
 
 The data-models and material libs don't really count. Material has one passing test, but there are none yet for the data-models.
 
@@ -904,6 +912,8 @@ apps/stromatolites/src/app/app.component.html:1:1 - error NG8001: 'clades-layout
 I don't get it. The clades-layout component is imported and declared in the LayoutModule which is imported into the stromatolites app.module, so it should be available to any component there, shouldn't it?
 
 Not sure what is going on. To debug this issue, I will create a new layout module and got step by step again using progressive enhancement to apply the changes. Making a commit now to start with a clean slate.
+
+The missing piece was the export in the layout module.  It has to not only declare the layout component, but export it also!  Sorry for all the drama.  I was starting to blame nx!
 
 #### Workflow shortcuts for Stromatolites
 

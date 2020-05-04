@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [CommonModule, MaterialModule, RouterModule],
-  declarations: [LayoutComponent]
+  declarations: [LayoutComponent],
+  exports: [LayoutComponent]
 })
 export class LayoutModule {}
