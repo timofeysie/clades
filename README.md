@@ -1003,19 +1003,75 @@ Time:        13.349s, estimated 16s
 
 A little better this time.  Nrwl has some new features that boast never compile or test unchanged code again, probably as a feature of their cloud suite.
 
+### [Route Guards and Products Lib](https://github.com/timofeysie/clades/issues/15)
 
+Add a lazy loaded lib with routing and make the container component to navigate to on login.
 
+Later we *will grow this new feature lib out with advance NgRx features later int he course but for now we will just* - Duncan Hunter.
 
-
-### 9 - Route Guards and Products Lib
-
-#### 9 - Route Guards and Products Lib
-[link](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/9-route-guards-and-products-lib)
+#### 9 - Route Guards and Products Lib [link](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/9-route-guards-and-products-lib)
 
 Add a lib for a products page
 
-ng g lib products --routing --lazy --prefix=app --parent-module=apps/customer-portal/src/app/app.module.ts
+```bash
+nx generate @nrwl/angular:lib products --routing --lazy --parent-module=apps/stromatolites/src/app/app.module.ts
+? Which stylesheet format would you like to use? SASS(.scss)  [ http://sass-lang.com   ]
+CREATE libs/products/README.md (140 bytes)
+CREATE libs/products/tsconfig.lib.json (408 bytes)
+CREATE libs/products/tsconfig.lib.prod.json (97 bytes)
+CREATE libs/products/tslint.json (244 bytes)
+CREATE libs/products/src/index.ts (39 bytes)
+CREATE libs/products/src/lib/products.module.ts (334 bytes)
+CREATE libs/products/src/lib/products.module.spec.ts (358 bytes)
+CREATE libs/products/tsconfig.json (123 bytes)
+CREATE libs/products/jest.config.js (353 bytes)
+CREATE libs/products/tsconfig.spec.json (233 bytes)
+CREATE libs/products/src/test-setup.ts (30 bytes)
+UPDATE workspace.json (27690 bytes)
+UPDATE nx.json (1463 bytes)
+UPDATE tsconfig.json (925 bytes)
+UPDATE apps/stromatolites/src/app/app.module.ts (983 bytes)
+```
 
+Generate the container component.
+
+```bash
+nx g @nrwl/angular:component  containers/products --project=products
+CREATE libs/products/src/lib/containers/products/products.component.html (23 bytes)
+CREATE libs/products/src/lib/containers/products/products.component.spec.ts (642 bytes)
+CREATE libs/products/src/lib/containers/products/products.component.ts (286 bytes)
+CREATE libs/products/src/lib/containers/products/products.component.css (0 bytes)
+UPDATE libs/products/src/lib/products.module.ts (449 bytes)
+```
+
+The original commands were:
+
+```bash
+ng g lib products --routing --lazy --prefix=app --parent-module=apps/customer-portal/src/app/app.module.ts
+ng g c containers/products --project=products
+```
+
+A default app route to always go to products page.  Check default routes added to AppModule.  Add a new default route to always load the products on app load
+
+They look like this:
+
+```js
+{
+  path: '',
+  pathMatch: 'full', redirectTo: 'products' },
+{
+  path: 'products',
+  loadChildren: '@demo-app/products#ProductsModule',
+}
+```
+
+The ProductsModule route looks like this:
+
+```js
+{ path: '', component: ProductsComponent }
+```
+
+Now the the 'products' button in the main menu links to the new products component.
 
 #### Workflow shortcuts for Stromatolites
 

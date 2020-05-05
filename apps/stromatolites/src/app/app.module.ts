@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 import { NxModule } from '@nrwl/nx';
 import { RouterModule } from '@angular/router';
 import { authRoutes, AuthModule } from '@clades/auth';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LayoutModule } from '@clades/layout';
 
 @NgModule({
@@ -13,7 +13,18 @@ import { LayoutModule } from '@clades/layout';
     BrowserModule,
     BrowserAnimationsModule,
     NxModule.forRoot(),
-    RouterModule.forRoot([{path: 'auth', children: authRoutes}], { initialNavigation: 'enabled' }),
+    RouterModule.forRoot(
+      [
+        { path: '', pathMatch: 'full', redirectTo: 'products' },
+        { path: 'auth', children: authRoutes },
+        {
+          path: 'products',
+          loadChildren: () =>
+            import('@clades/products').then(module => module.ProductsModule)
+        }
+      ],
+      { initialNavigation: 'enabled' }
+    ),
     AuthModule,
     LayoutModule
   ],

@@ -74,6 +74,9 @@
     "luca-e2e": {
       "tags": [],
       "implicitDependencies": ["luca"]
+    },
+    "products": {
+      "tags": []
     }
   }
 }
