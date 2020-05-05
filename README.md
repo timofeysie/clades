@@ -27,8 +27,9 @@ nx serve luca # React Ionic test app
 nx serve monophyletic # serve the React front end
 nx serve stratum # Angular app with unit tests for the counter example
 nx serve stromatolites # Angular app for the updated Duncan workshop code
+nx test layout # test the layout lib used by stromatolites
 nx test stratum --watch # run Angular Jest unit tests
-nx test stromatolites --watch
+nx test stromatolites --watch0
 yarn run server # stromatolites server runs on http://localhost:3000
 nx dep-graph # show the dependency graph
 nx affected:dep-graph # show the deo-graph with updates needed
@@ -890,8 +891,8 @@ ng g c containers/layout --project=layout
 Add the usual imports to the new layout module:
 
 ```js
-import { MaterialModule } from '@<workspace>/material'; // Added
-import { RouterModule } from '@angular/router'; // Added
+import { MaterialModule } from '@<workspace>/material';
+import { RouterModule } from '@angular/router';
 ```
 
 #### **`libs/layout/src/lib/containers/layout/layout.component.html`**
@@ -914,6 +915,107 @@ I don't get it. The clades-layout component is imported and declared in the Layo
 Not sure what is going on. To debug this issue, I will create a new layout module and got step by step again using progressive enhancement to apply the changes. Making a commit now to start with a clean slate.
 
 The missing piece was the export in the layout module.  It has to not only declare the layout component, but export it also!  Sorry for all the drama.  I was starting to blame nx!
+
+### [Fixing the layout unit test](https://github.com/timofeysie/clades/issues/16)
+
+Before moving on, let's let how the new libs tests are doing.
+
+```bash
+nx test layout --watch
+...
+FAIL  libs/layout/src/lib/containers/layout/layout.component.spec.ts (12.31s)
+  ● LayoutComponent › should create
+    Template parse errors:
+    Can't bind to 'routerLink' since it isn't a known property of 'button'. (" as user">
+```
+
+Not so good.  Best fix it now before we end up with a giant mess of failing tests and give up on them altogether.
+
+That required an import and add to the imports array.
+
+```js
+import { RouterModule } from '@angular/router';
+...
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [ RouterModule, MaterialModule ],
+```
+
+Next failure:
+
+```bash
+    Template parse errors:
+    'mat-toolbar' is not a known element:
+```
+
+```js
+import { MaterialModule } from '@clades/material';
+...
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [ RouterModule, MaterialModule ],
+```
+
+Next:
+
+```js
+  ● LayoutComponent › should create
+    NullInjectorError: StaticInjectorError(DynamicTestModule)[HttpClient]:
+      StaticInjectorError(Platform: core)[HttpClient]:
+        NullInjectorError: No provider for HttpClient!
+```
+
+Then this again:
+
+```bash
+  ● LayoutComponent › should create
+    NullInjectorError: StaticInjectorError(DynamicTestModule)[RouterLinkActive -> Router]:
+      StaticInjectorError(Platform: core)[RouterLinkActive -> Router]:
+        NullInjectorError: No provider for Router!
+```
+
+First it was the router-link, now it's the router.  Who knows this stuff beforehand?
+
+```js
+import { RouterTestingModule } from "@angular/router/testing";
+...
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [ RouterModule, RouterTestingModule, MaterialModule, HttpClientModule ],
+```
+
+Then:
+
+```bash
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+Snapshots:   0 total
+Time:        18.026s
+```
+
+There's actually two tests, another test for the module.  But that took 18 seconds?  Wow.  Run them all:
+
+```bash
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        13.349s, estimated 16s
+```
+
+A little better this time.  Nrwl has some new features that boast never compile or test unchanged code again, probably as a feature of their cloud suite.
+
+
+
+
+
+### 9 - Route Guards and Products Lib
+
+#### 9 - Route Guards and Products Lib
+[link](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/9-route-guards-and-products-lib)
+
+Add a lib for a products page
+
+ng g lib products --routing --lazy --prefix=app --parent-module=apps/customer-portal/src/app/app.module.ts
+
 
 #### Workflow shortcuts for Stromatolites
 
