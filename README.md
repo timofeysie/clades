@@ -27,7 +27,7 @@ nx serve luca # React Ionic test app
 nx serve monophyletic # serve the React front end
 nx serve stratum # Angular app with unit tests for the counter example
 nx serve stromatolites # Angular app for the updated Duncan workshop code
-nx test layout # test the layout lib used by stromatolites
+nx test layout/products # test the layout or products libs used by stromatolites
 nx test stratum --watch # run Angular Jest unit tests
 nx test stromatolites --watch0
 yarn run server # stromatolites server runs on http://localhost:3000
@@ -1073,6 +1073,117 @@ The ProductsModule route looks like this:
 
 Now the the 'products' button in the main menu links to the new products component.
 
+Make sure the tests are passing:
+
+```bash
+nx test products
+```
+
+#### Add a route guard to protect products page
+
+```bash
+nx g @nrwl/angular:guard  guards/auth/auth --project=auth
+? Which interfaces would you like to implement? (Press <space> to select, <a> to toggle
+ all, <i> to invert selection)CanActivate
+CREATE libs/auth/src/lib/guards/auth/auth.guard.spec.ts (331 bytes)
+CREATE libs/auth/src/lib/guards/auth/auth.guard.ts (456 bytes)
+```
+
+That's very nice that it will add some interfaces implementations for us.  How civilized!
+
+The original command was:
+
+```bash
+ng g guard guards/auth/auth --project=auth
+```
+
+The aurthgaurd must be exported in the auth index file, and then added to the stromatolites module and used in the routing.
+
+```js
+{
+  path: 'products',
+  loadChildren: '@demo-app/products#ProductsModule',
+  canActivate: [AuthGuard]
+}
+```
+
+or this:
+
+```js
+{
+  path: 'products',
+  loadChildren: () =>
+    import('@clades/products').then(module => module.ProductsModule),
+  canActivate: [AuthGuard]
+}
+```
+
+That looks like a new syntax for doing lazy loading.  It's shown in [the official docs])https://angular.io/guide/lazy-loading-ngmodules) as the --module option.
+
+The docs also say it uses *loadChildren followed by a function that uses the browser's built-in import('...') syntax for dynamic imports. The import path is the relative path to the module.*
+
+So that's something that has changed in the two years since Duncan did his workshop.
+
+Now if you run the server and run the app in a new termainal, and without logging in go to http://localhost:4200/products, you will be denied.
+
+#### Auth unit tests
+
+I think so far the auth module has not been tested.  It's not on the workflow list yet at least.  Run the command and add it to the list.
+
+```bash
+nx test auth --watch
+```
+
+The result is expected:
+
+```bash
+ FAIL  libs/auth/src/lib/guards/auth/auth.guard.spec.ts (6.572s)
+  AuthGuard
+    × should be created (362ms)
+  ● AuthGuard › should be created
+    NullInjectorError: StaticInjectorError(DynamicTestModule)[Router]:
+      StaticInjectorError(Platform: core)[Router]:
+        NullInjectorError: No provider for Router!
+```
+
+There are no arrays at all in the configureTestingModule({}) object.  Add it now:
+
+```js
+import { RouterTestingModule } from '@angular/router/testing';
+...
+ imports: [RouterTestingModule]
+```
+
+The next error is:
+
+```bash
+NullInjectorError: No provider for HtHttpClient
+tpClient!
+```
+
+That requires the HttpClientTestingModule.
+
+```js
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+...
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule, 
+        HttpClientTestingModule]
+    });
+    guard = TestBed.inject(AuthGuard);
+  });
+```
+
+Now the tests pass.  It would be wise at this point to write a meaningful test to confirm the guard is working without having to test it manually.  This will give you some confidence that the app is still secure in the future after other devs start to add code to the app.
+
+For now create a list of things to test and come back to that.  It will be nice to get through the whole workshop with updated code.  It's mainly the Ngrx that this is for, not auth guards at this point.
+
+#### Cache the user in local storage to save logging in for the rest or the workshop.
+
+Next time.
+
 #### Workflow shortcuts for Stromatolites
 
 Just a reminder of what needs to be run when working on this project.
@@ -1082,6 +1193,7 @@ yarn run server
 nx serve stromatolites
 nx test stromatolites --watch
 nx test layout --watch
+nx test products --watch
 ```
 
 #### Potential to do list
@@ -1091,6 +1203,10 @@ Here is a growing list of items that highlight areas of improvement for a potent
 - NodeJS Express app, AWS Cognito, Azure B2C, or Firebase to replace the JSON demo server.
 - Centralize validation error messages as noted in step 8: Reactive Forms and User interface.
 - Use a web components library instead of the Angular specific layout lib created in step 10: The Layout lib.
+
+#### Things to test
+
+- the auth guard
 
 ## Testing NgRx
 

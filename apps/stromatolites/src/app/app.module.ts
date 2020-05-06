@@ -5,6 +5,7 @@ import { NxModule } from '@nrwl/nx';
 import { RouterModule } from '@angular/router';
 import { authRoutes, AuthModule } from '@clades/auth';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AuthGuard } from '@clades/auth';
 import { LayoutModule } from '@clades/layout';
 
 @NgModule({
@@ -20,7 +21,8 @@ import { LayoutModule } from '@clades/layout';
         {
           path: 'products',
           loadChildren: () =>
-            import('@clades/products').then(module => module.ProductsModule)
+            import('@clades/products').then(module => module.ProductsModule),
+          canActivate: [AuthGuard]
         }
       ],
       { initialNavigation: 'enabled' }
