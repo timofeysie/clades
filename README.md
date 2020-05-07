@@ -4,10 +4,13 @@ This project was generated using [Nx](https://nx.dev).
 
 <p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" width="450"></p>
 
-Currently unit testing the counter example to create a guide for TDD workflow for NgRx Angular development.
+This repo contains an updated implementation of the steps to set up an enterprise Angular applications with NgRx and Nx by Duncan Hunter.  This app is named Stromatolites after the first life on the planet.
+
+It also has the Stratum app with unit tests for the counter example to create a guide for using TDD (test driven development) workflow for NgRx Angular development.
 
 ## Table of contents
 
+- [Testing a dispatch action](#testing-a-dispatch-action)
 - [The @nxtend/ionic-react plugin](#the-@nxtend/ionic-react-plugin)
 - [Re-implementing the Duncan](#re-implementing-the-Duncan)
 - [Testing Ngrx](#testing-ngrx)
@@ -116,7 +119,7 @@ nx test stratum --watch # run Angular Jest unit tests
 nx e2e stratum-e2e --watch # run the end to end tests
 ```
 
-## Testing a chain of actions
+### Testing a chain of actions
 
 To test a series of actions chained in one way or another, we can use the unit/integration testing format by attaching a spinner, making an async call, then doing some calculation on the result then stopping the spinner.
 
@@ -1229,6 +1232,10 @@ a) Update auth service to set a token in local storage
 b) Add an angular interceptor in a new folder in the auth lib
 
 Note: Currently there is no ng generate command for interceptors so we need to add it manually.
+
+
+
+
 
 #### Workflow shortcuts for Stromatolites
 
