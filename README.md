@@ -1230,6 +1230,146 @@ Duncan says in a note: *Currently there is no ng generate command for intercepto
 
 This remains true.  A list of what the CLI can do out of the box is [here](https://nx.dev/react/cli/generate).  See the section on generating an Ionic app which uses a community created schematic to scaffold an app.
 
+### Another counter example
+
+In his [introduction to Ngrx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/10-ngrx-introduction), Duncan shows a reducer for a counter example:
+
+```js
+export function counterReducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return state + 1;
+
+    case 'DECREMENT':
+      return state - 1;
+
+    default:
+      return state;
+  }
+}
+```
+
+Contrast that with the one created from the official Ngrx docs:
+
+```js
+const _counterReducer = createReducer(initialState,
+  on(increment, state => state + 1),
+  on(decrement, state => state - 1),
+  on(reset, state => 0),
+);
+```
+
+Much tighter now, huh?  The action strings are in their own file.
+
+Duncan notes that *changeDetection: ChangeDetectionStrategy.OnPush* is required *to avoid issue with change detection*.
+
+As well as defining these actions also in the workshop, Duncan defines some action creators
+
+```js
+export class Increment implements Action {
+    readonly type = CounterActionTypes.Increment;
+}
+```
+
+The current syntax for that is:
+
+```js
+export const increment = createAction('[Counter Component] Increment');
+```
+
+Again, it's tighter.  If Ngrx is going to keep up with React hooks, it's going to have to be.
+
+Duncan does go a bit further in the workshop and adds an action State interfaces in the reducer file.
+
+```js
+export interface CounterState {
+  count: number;
+}
+```
+
+This is the "enterprise" part of the workshop.  After this we add a global State interface which *is useful to be able to type your injected store and select state*.
+
+To use the state interface in app component, we type the store in the constructor.
+
+Currently we have:
+
+```js
+constructor(private store: Store<{ count: number }>) {
+  this.count$ = store.pipe(select('count'));
+}
+```
+
+If we implement the Ducan code in the official counter example code, there is a problem.
+
+```js
+constructor(private store: Store<AppState>) {
+  this.count$ = store.pipe(select(state => state.counter.count));
+}
+```
+
+It may be a difference in the word count and counter because we see this long TS error:
+
+```txt
+No overload matches this call.
+Overload 1 of 8,
+'(mapFn: (state: AppState, props: unknown) 
+  => number, props?: unknown): (source$: Observable<AppState>)
+  => Observable<number>', gave the following error.
+Argument of type '"count"' is not assignable to parameter of type '(state: AppState, props: unknown)
+  => number'.
+Overload 2 of 8, '(key: "counter"): (source$: Observable<AppState>)
+  => Observable<CounterState>', gave the following error.
+Argument of type '"count"' is not assignable to parameter of type '"counter"'.ts(2769)
+```
+
+If this is changed from counter to count, the following error shows up under count$:
+
+```txt
+Type 'Observable<CounterState>' is not assignable to type 'Observable<number>'.
+```
+
+This change seems to fix the issue:
+
+```js
+constructor(private store: Store<AppState>) {
+    this.count$ = store.pipe(select(state => state.counter.counter)); 
+}
+```
+
+Run or test the app to find out.
+
+```bash
+nx serve stratum
+nx test stratum --watch
+```
+
+Doesn't work.  This is the console error:
+
+```bash
+core.js:6189 ERROR TypeError: Cannot read property 'counter' of undefined
+    at counter.component.ts:17
+```
+
+We have a CounterState and a AppState interface.
+
+```js
+export interface CounterState {
+  counter: number;
+}
+```
+
+Duncan's version:
+
+```js
+export interface AppState {
+  counter: CounterState;
+}
+```
+
+It doesn't seem right to have to type state.counter.counter.
+
+There needs to be more work done to reconcile the official example counter code and Duncan's code.  Since this is not the goal of the project at the moment, we will leave it for now and add it to the to do list to be triaged along with all the other needed tasks.
+
 #### Workflow shortcuts for Stromatolites
 
 Just a reminder of what needs to be run when working on this project.
