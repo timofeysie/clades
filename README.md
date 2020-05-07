@@ -1180,9 +1180,55 @@ Now the tests pass.  It would be wise at this point to write a meaningful test t
 
 For now create a list of things to test and come back to that.  It will be nice to get through the whole workshop with updated code.  It's mainly the Ngrx that this is for, not auth guards at this point.
 
-#### Cache the user in local storage to save logging in for the rest or the workshop.
+#### Cache the user in local storage
 
-Next time.
+To save logging in again and again, the local storage can be used to keep the user object.
+
+#### **`libs\auth\src\lib\services\auth\auth.service.ts` constructor**
+
+```js
+constructor(private httpClient: HttpClient) {
+    const user = localStorage.getItem('user');
+    if(user) {
+      this.userSubject$.next(JSON.parse(user));
+    }
+  }
+```
+
+And then in the login function, set the user object the local storage so that next time it will be ready to go.
+
+#### **`libs\auth\src\lib\services\auth\auth.service.ts` login**
+
+```js
+    .pipe(tap((user: User) => {
+        this.userSubject$.next(user);
+        localStorage.setItem('user', JSON.stringify(user));
+    }));
+```
+
+Then when you run the app, in the dev tools application tab, you can see the object in the storage details for http://localhost:4200/
+
+Coming up, extras.
+
+#### Extras
+
+1. Add logout functionality
+
+Try these steps below to logout a user.
+
+a) Add logout button to main menu
+
+b) Call service and logout the user by clearing the behavior subject
+
+c) Navigate to login page
+
+2. Add angular interceptor
+
+a) Update auth service to set a token in local storage
+
+b) Add an angular interceptor in a new folder in the auth lib
+
+Note: Currently there is no ng generate command for interceptors so we need to add it manually.
 
 #### Workflow shortcuts for Stromatolites
 
