@@ -1215,27 +1215,20 @@ Coming up, extras.
 
 #### Extras
 
-1. Add logout functionality
-
-Try these steps below to logout a user.
-
-a) Add logout button to main menu
-
-b) Call service and logout the user by clearing the behavior subject
-
-c) Navigate to login page
-
+1. [Add logout functionality](https://github.com/timofeysie/clades/issues/17)
 2. Add angular interceptor
 
-a) Update auth service to set a token in local storage
+#### [Add angular interceptor](https://github.com/timofeysie/clades/issues/18)
 
-b) Add an angular interceptor in a new folder in the auth lib
+This requires updating the auth service to set a token in local storage
 
-Note: Currently there is no ng generate command for interceptors so we need to add it manually.
+Then add an angular interceptor in a new folder in the auth lib to add a Header to all requests.
 
+Logout and login again.  Look in the network traffic of the dev tools to see the Header is being added.  Sorry, but I'm not seeing the header there.  Put it on the to do list.
 
+Duncan says in a note: *Currently there is no ng generate command for interceptors so we need to add it manually.*
 
-
+This remains true.  A list of what the CLI can do out of the box is [here](https://nx.dev/react/cli/generate).  See the section on generating an Ionic app which uses a community created schematic to scaffold an app.
 
 #### Workflow shortcuts for Stromatolites
 
@@ -1256,6 +1249,7 @@ Here is a growing list of items that highlight areas of improvement for a potent
 - NodeJS Express app, AWS Cognito, Azure B2C, or Firebase to replace the JSON demo server.
 - Centralize validation error messages as noted in step 8: Reactive Forms and User interface.
 - Use a web components library instead of the Angular specific layout lib created in step 10: The Layout lib.
+- Fix the interceptor
 
 #### Things to test
 
