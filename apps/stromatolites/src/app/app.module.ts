@@ -7,6 +7,11 @@ import { authRoutes, AuthModule } from '@clades/auth';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthGuard } from '@clades/auth';
 import { LayoutModule } from '@clades/layout';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,7 +33,30 @@ import { LayoutModule } from '@clades/layout';
       { initialNavigation: 'enabled' }
     ),
     AuthModule,
-    LayoutModule
+    LayoutModule,
+    StoreModule.forRoot(
+      {},
+      {
+        metaReducers: !environment.production ? [] : [],
+        runtimeChecks: {
+          strictActionImmutability: true,
+          strictStateImmutability: true
+        }
+      }
+    ),
+    EffectsModule.forRoot([]),
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
+    StoreRouterConnectingModule.forRoot(),
+    StoreModule.forRoot(
+      {},
+      {
+        // metaReducers: !environment.production ? [] : [],
+        runtimeChecks: {
+          strictActionImmutability: true,
+          strictStateImmutability: true
+        }
+      }
+    )
   ],
   providers: [],
   bootstrap: [AppComponent]

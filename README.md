@@ -1370,6 +1370,412 @@ It doesn't seem right to have to type state.counter.counter.
 
 There needs to be more work done to reconcile the official example counter code and Duncan's code.  Since this is not the goal of the project at the moment, we will leave it for now and add it to the to do list to be triaged along with all the other needed tasks.
 
+### [Adding NgRx](https://github.com/timofeysie/clades/issues/20)
+
+This is what we came for.  It's been a month or two since covering this section the first time using Nrwl 7, so setting up ngrx in a new app will need a refresher.
+
+Find the original Duncan Hunter section here: [11 - Adding NgRx to Nx App](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/11-adding-ngrx-to-nx-app)
+
+The workshop calls for just adding the StoreModule.forRoot and EffectsModule.forRoot calls in the app.module without generating any new files.  If you want to see the files that get generated using Nrwl 9, checkout the *Generating base stores* section.
+
+The nx command for adding NgRx [shown in the official docs](https://nx.dev/react/plugins/angular/schematics/ngrx) is:
+
+```bash
+nx generate ngrx ...
+nx g @nrwl/angular:ngrx --module=apps/stromatolites/src/app/app.module.ts
+```
+
+The [Ngrx docs](https://ngrx.io/guide/store/install) say:
+
+```bash
+yarn add @ngrx/store
+ng add @ngrx/store
+ng add @ngrx/store --minimal false
+```
+
+To create just the basics and follow the workshop guide, use the following command:
+
+```bash
+nx g @nrwl/angular:ngrx --module=apps/stromatolites/src/app/app.module.ts  --minimal true
+? What name would you like to use for the NgRx feature state? An example would be "users". products
+? Is this the root state of the application? Yes
+? Would you like to use a Facade with your NgRx state? No
+```
+
+Duncan uses the module *module* option:  *The path to NgModule where the feature state will be registered. The host directory will create/use the new state directory.
+
+I'm not sure of the correct answers at this point for those questions above, as they are not covered in the workshop.  If there are any problems with that I will have to come back and update this section later.
+
+For now, there is no mention of products in the app.module except for the routing which was already there, so the answer to the feature state was not used.
+
+This line is commented out in the workshop with the note: *Due to issue with StoreFreeze make sure you comment out this line of code*:
+
+```js
+metaReducers: !environment.production ? [] : [],
+```
+
+Next:
+
+Add NgRx Auth lib making it a state state
+
+```bash
+nx g @nrwl/angular:ngrx auth --module=libs/auth/src/lib/auth.module.ts
+```
+
+The previous command was:
+
+```bash
+ng generate ngrx auth --module=libs/auth/src/lib/auth.module.ts
+```
+
+#### The previous method of adding NgRx
+
+Here is the old command Duncan shows:
+
+```bash
+ng g ngrx app --module=apps/customer-portal/src/app/app.module.ts  --onlyEmptyRoot
+```
+
+In the Ngrx docs, there is no mention of the onlyEmptyRoot flag.
+onlyEmptyRoot (Default: false) Deprecated, use minimal. Do not generate any files. Only generate StoreModule.forRoot and EffectsModule.forRoot (e.g., --onlyEmptyRoot).
+
+I have notes on all these methods for adding ngrx:
+
+```bash
+ng g @nrwl/angular:ngrx <featurename> --module=<path-to-module> --defaults [options]
+ng add @ngrx/store
+ng g store State --root --module app.module.ts
+An unhandled exception occurred: Schematic "store" not found in collection "@schematics/angular".
+See "C:\Users\timof\AppData\Local\Temp\ng-qoKM4A\angular-errors.log" for further details.
+```
+
+Add the vanilla NgRx approach:
+
+```bash
+ng g store State --root --module app.module.ts
+```
+
+#### Generating base stores
+
+Generating a base store and set of Redux classes is a good guide for the current state of NgRx.  The code for these commands aside from the workshop code can be found on the *base-store* branch in the repo.
+
+```bash
+nx g @nrwl/angular:ngrx --module=apps/stromatolites/src/app/app.module.ts
+? What name would you like to use for the NgRx feature state? An example would be "users" items
+? Is this the root state of the application? (y/N)  
+? Would you like to use a Facade with your NgRx state? No
+UPDATE apps/stromatolites/src/app/app.module.ts (1797 bytes)
+UPDATE package.json (3386 bytes)
+```
+
+(What's with the question marks at the beginning of the sentence.  It's kind of spanish)
+
+The following is added to the app.module file.
+
+```js
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
+...
+    AuthModule,
+    LayoutModule,
+    StoreModule.forRoot(
+      {},
+      {
+        metaReducers: !environment.production ? [] : [],
+        runtimeChecks: {
+          strictActionImmutability: true,
+          strictStateImmutability: true
+        }
+      }
+    ),
+    EffectsModule.forRoot([]),
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
+    StoreRouterConnectingModule.forRoot()
+```
+
+I was expecting a little more after all those questions.
+
+What happens with the   option?
+
+```bash
+nx g @nrwl/angular:ngrx --module=apps/stromatolites/src/app/app.module.ts --minimal false
+? What name would you like to use for the NgRx feature state? An example would be "users". items
+? Is this the root state of the application? Yes
+? Would you like to use a Facade with your NgRx state? No
+√ Packages installed successfully.
+CREATE apps/stromatolites/src/app/+state/items.actions.ts (385 bytes)
+CREATE apps/stromatolites/src/app/+state/items.effects.spec.ts (1111 bytes)
+CREATE apps/stromatolites/src/app/+state/items.effects.ts (807 bytes)
+CREATE apps/stromatolites/src/app/+state/items.models.ts (112 bytes)
+CREATE apps/stromatolites/src/app/+state/items.reducer.spec.ts (1034 bytes)
+CREATE apps/stromatolites/src/app/+state/items.reducer.ts (1280 bytes)
+CREATE apps/stromatolites/src/app/+state/items.selectors.spec.ts (1678 bytes)
+CREATE apps/stromatolites/src/app/+state/items.selectors.ts (1046 bytes)
+UPDATE apps/stromatolites/src/app/app.module.ts (1996 bytes)
+UPDATE package.json (3386 bytes)
+```
+
+Now the items are added to the app.module.ts file:
+
+```js
+    EffectsModule.forRoot([ItemsEffects]),
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
+    StoreRouterConnectingModule.forRoot(),
+    StoreModule.forFeature(fromItems.ITEMS_FEATURE_KEY, fromItems.reducer)
+```
+
+That's what one would expect.  Then there are actions, effects, models, reducers and selectors.  For reference they will be all included here.
+
+#### **`apps\stromatolites\src\app\+state\items.actions.ts`**
+
+```js
+export const loadItemsSuccess = createAction(
+  '[Items] Load Items Success',
+  props<{ items: ItemsEntity[] }>()
+);
+```
+
+#### **`apps\stromatolites\src\app\+state\items.effects.ts`**
+
+```js
+export class ItemsEffects {
+  loadItems$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ItemsActions.loadItems),
+      fetch({
+        run: action => {
+          // Your custom service 'load' logic goes here. For now just return a success action...
+          return ItemsActions.loadItemsSuccess({ items: [] });
+        },
+
+        onError: (action, error) => {
+          console.error('Error', error);
+          return ItemsActions.loadItemsFailure({ error });
+        }
+      })
+    )
+  );
+```
+
+#### **`apps\stromatolites\src\app\+state\items.effects.spec.ts`**
+
+```js
+import { TestBed, async } from '@angular/core/testing';
+import { Observable } from 'rxjs';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { provideMockStore } from '@ngrx/store/testing';
+import { NxModule, DataPersistence } from '@nrwl/angular';
+import { hot } from '@nrwl/angular/testing';
+import { ItemsEffects } from './items.effects';
+import * as ItemsActions from './items.actions';
+
+describe('ItemsEffects', () => {
+  let actions: Observable<any>;
+  let effects: ItemsEffects;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [NxModule.forRoot()],
+      providers: [
+        ItemsEffects,
+        DataPersistence,
+        provideMockActions(() => actions),
+        provideMockStore()
+      ]
+    });
+
+    effects = TestBed.get(ItemsEffects);
+  });
+
+  describe('loadItems$', () => {
+    it('should work', () => {
+      actions = hot('-a-|', { a: ItemsActions.loadItems() });
+
+      const expected = hot('-a-|', {
+        a: ItemsActions.loadItemsSuccess({ items: [] })
+      });
+
+      expect(effects.loadItems$).toBeObservable(expected);
+    });
+  });
+});
+```
+
+#### **`apps\stromatolites\src\app\+state\items.effects.ts`.**
+
+```bash
+export interface ItemsEntity {
+  id: string | number; // Primary ID
+}
+```
+
+#### **`apps\stromatolites\src\app\+state\items.reducer.ts`**
+
+```js
+export const ITEMS_FEATURE_KEY = 'items';
+
+export interface State extends EntityState<ItemsEntity> {
+  selectedId?: string | number; // which Items record has been selected
+  loaded: boolean; // has the Items list been loaded
+  error?: string | null; // last none error (if any)
+}
+
+export interface ItemsPartialState {
+  readonly [ITEMS_FEATURE_KEY]: State;
+}
+
+export const itemsAdapter: EntityAdapter<ItemsEntity> = createEntityAdapter<
+  ItemsEntity
+>();
+
+export const initialState: State = itemsAdapter.getInitialState({
+  // set initial required properties
+  loaded: false
+});
+
+const itemsReducer = createReducer(
+  initialState,
+  on(ItemsActions.loadItems, state => ({
+    ...state,
+    loaded: false,
+    error: null
+  })),
+  on(ItemsActions.loadItemsSuccess, (state, { items }) =>
+    itemsAdapter.addAll(items, { ...state, loaded: true })
+  ),
+  on(ItemsActions.loadItemsFailure, (state, { error }) => ({ ...state, error }))
+);
+```
+
+#### **`apps\stromatolites\src\app\+state\items.reducer.spec.ts`**
+
+```js
+import { ItemsEntity } from './items.models';
+import * as ItemsActions from './items.actions';
+import { State, initialState, reducer } from './items.reducer';
+
+describe('Items Reducer', () => {
+  const createItemsEntity = (id: string, name = '') =>
+    ({
+      id,
+      name: name || `name-${id}`
+    } as ItemsEntity);
+
+  beforeEach(() => {});
+
+  describe('valid Items actions', () => {
+    it('loadItemsSuccess should return set the list of known Items', () => {
+      const items = [
+        createItemsEntity('PRODUCT-AAA'),
+        createItemsEntity('PRODUCT-zzz')
+      ];
+      const action = ItemsActions.loadItemsSuccess({ items });
+
+      const result: State = reducer(initialState, action);
+
+      expect(result.loaded).toBe(true);
+      expect(result.ids.length).toBe(2);
+    });
+  });
+
+  describe('unknown action', () => {
+    it('should return the previous state', () => {
+      const action = {} as any;
+
+      const result = reducer(initialState, action);
+
+      expect(result).toBe(initialState);
+    });
+  });
+});
+```
+
+#### **`apps\stromatolites\src\app\+state\items.selectors.ts`**
+
+```js
+// Lookup the 'Items' feature state managed by NgRx
+export const getItemsState = createFeatureSelector<ItemsPartialState, State>(
+  ITEMS_FEATURE_KEY
+);
+
+const { selectAll, selectEntities } = itemsAdapter.getSelectors();
+
+export const getItemsLoaded = createSelector(
+  getItemsState,
+  (state: State) => state.loaded
+);
+```
+
+#### **`apps\stromatolites\src\app\+state\items.selectors.spec.ts`**
+
+```js
+import { ItemsEntity } from './items.models';
+import { State, itemsAdapter, initialState } from './items.reducer';
+import * as ItemsSelectors from './items.selectors';
+
+describe('Items Selectors', () => {
+  const ERROR_MSG = 'No Error Available';
+  const getItemsId = it => it['id'];
+  const createItemsEntity = (id: string, name = '') =>
+    ({
+      id,
+      name: name || `name-${id}`
+    } as ItemsEntity);
+
+  let state;
+
+  beforeEach(() => {
+    state = {
+      items: itemsAdapter.addAll(
+        [
+          createItemsEntity('PRODUCT-AAA'),
+          createItemsEntity('PRODUCT-BBB'),
+          createItemsEntity('PRODUCT-CCC')
+        ],
+        {
+          ...initialState,
+          selectedId: 'PRODUCT-BBB',
+          error: ERROR_MSG,
+          loaded: true
+        }
+      )
+    };
+  });
+
+  describe('Items Selectors', () => {
+    it('getAllItems() should return the list of Items', () => {
+      const results = ItemsSelectors.getAllItems(state);
+      const selId = getItemsId(results[1]);
+
+      expect(results.length).toBe(3);
+      expect(selId).toBe('PRODUCT-BBB');
+    });
+
+    it('getSelected() should return the selected Entity', () => {
+      const result = ItemsSelectors.getSelected(state);
+      const selId = getItemsId(result);
+
+      expect(selId).toBe('PRODUCT-BBB');
+    });
+
+    it("getItemsLoaded() should return the current 'loaded' status", () => {
+      const result = ItemsSelectors.getItemsLoaded(state);
+
+      expect(result).toBe(true);
+    });
+
+    it("getItemsError() should return the current 'error' state", () => {
+      const result = ItemsSelectors.getItemsError(state);
+
+      expect(result).toBe(ERROR_MSG);
+    });
+  });
+});
+```
+
 #### Workflow shortcuts for Stromatolites
 
 Just a reminder of what needs to be run when working on this project.
@@ -1904,466 +2310,9 @@ Update the MyCounterComponent class with a selector for the count, and methods t
 
 Add the MyCounter component to your AppComponent template.
 
-## Steps for updated NgRx example enterprise app
+## Previous notes from the Quallasuyu implementation using Nrwl 7
 
-(This section is a work in progress)
-
-Due to problems with the completed [Workshop: Enterprise Angular applications with NgRx and Nx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/) which is more than two years out of date now, a new project following along the general steps of development used to create the customer portal there is the plan now.
-
-The following is the structure of CLI commands and some extra details that, linked with commits containing the added code could become a guide for adding new features using the techniques Duncan sets out in his workshop.
-
-### Installing the nx CLI
-
-Documentation on getting started with the nx CLI can be found [here](https://nx.dev/angular/cli/overview).
-
-```bash
-npm install -g @nrwl/cli
-yarn global add @nrwl/cli
-```
-
-Don't mix package managers. If you start with npm, always use those commands. If you start with yarn, stay with it. Multiple lock files and other issues can arise. Yarn might be better for monorepo purposes.
-
-### Generate a new workspace
-
-```bash
-ng new clades --collection=@nrwl/schematics
-```
-
-### Create a new applications
-
-In the Duncan Hunter workshop, the name was customer-portal, we will be creating an app called stromatolites.
-
-```bash
-ng g application stromatolites --style=scss --routing --prefix=app
-```
-
-```bash
->ng g application stromatolites --style=scss --routing --prefix=app
-The generate command requires to be run in an Angular project, but a project definition could not be found.
-```
-
-The current docs show this CLI command to create an Angular app (notice it says node, not angular):
-
-```bash
-nx generate @nrwl/node:app stromatolites
-```
-
-Despite what the docs say, this will indeed create an NodeJS app. To create an Angular app, you do need to say 'angular' to the CLI:
-
-```bash
-nx generate @nrwl/angular:app stromatolites
-```
-
-Notes from the [official docs](https://nx.dev/angular/tutorial/01-create-application) show the method using npx and the CLI to answer these questions.
-
-```bash
-npx create-nx-workspace@latest
-? Workspace name (e.g., org name)     myorg
-? What to create in the new workspace angular
-? Application name                    todos
-? Default stylesheet format           CSS
-```
-
-When creating the first React app for this repo, this was also needed:
-
-```bash
-npm i @nrwl/workspace
-```
-
-The workflow commands now are:
-
-```bash
-nx serve stromatolites
-nx run stromatolites:serve
-```
-
-They are equivalent commands.
-
-### Issues with creating a new app
-
-```bash
->ng g application stromatolites --style=scss --routing --prefix=app
-The generate command requires to be run in an Angular project, but a project definition could not be found.
-```
-
-### Serve the app
-
-```bash
-ng s --project=customer-portal
-```
-
-```bash
-nx serve todos
-npm run nx -- serve todos
-npm run nx -- serve todos
-```
-
-### step 3 login form
-
-```bash
->ng g c components/login-form --project=auth --skip-import
-CREATE libs/auth/src/lib/components/login-form/login-form.component.html/spec.ts/.ts.scss
-```
-
-### Generating a lib
-
-```bash
-ng g lib auth --routing --prefix=app --parent-module=apps/customer-portal/src/app/app.module.ts
-ng s --project=customer-portal
-```
-
-### Demo server
-
-```bash
-npm i json-server ts-node --save-dev
-```
-
-### Create the auth service
-
-```bash
-ng g service services/auth/auth --project=auth
-```
-
-### Generate a shared data-model
-
-See the appropriate section in the workshop.
-
-### Setting up Material Design
-
-```bash
-npm install @angular/material @angular/cdk @angular/flex-layout @angular/animations
-yarn add @angular/material @angular/cdk @angular/flex-layout @angular/animations
-```
-
-```bash
-? What framework should this library use? Angular    [ https://angular.io/ ]
-```
-
-Next issue:
-
-```bash
-ERROR in libs/material/src/lib/material.module.ts(16,8): error TS2306: File 'C:/Users/timof/repos/timofeysie/quallasuyu/node_modules/@angular/material/index.d.ts' is not a module.
-```
-
-Thanks to [this SO answer](https://stackoverflow.com/questions/58594311/angular-material-index-d-ts-is-not-a-module), we know that it's a Angular 9 breaking change probably for tree shaking purposes. So instead of doing a single line import with stuff like this:
-
-```bash
-import {
-  ...
-  MatSelectModule
-} from '@angular/material';
-```
-
-We have to do this:
-
-```bash
-...
-import { MatSelectModule } from '@angular/material/select';
-```
-
-Then however, there are more errors:
-
-```bash
-ERROR in node_modules/@angular/cdk/coercion/array.d.ts(10,60): error TS1005: ',' expected.
-node_modules/@angular/cdk/coercion/array.d.ts(10,61): error TS1005: ',' expected.
-node_modules/@angular/cdk/coercion/array.d.ts(10,75): error TS1144: '{' or ';' expected.
-node_modules/@angular/cdk/coercion/array.d.ts(10,77): error TS1011: An element access expression should take an argument.
-```
-
-We may not be so lucky this time, the only whiff of this on Google is this [as yet unanswered question](https://stackoverflow.com/questions/60949170/cannot-import-matdialogmodule-in-app-module). The asker has an Angular version mismatch:
-
-```TypeScript
-        "@angular/animations": "^7.2.16",
-        "@angular/cdk": "^9.2.0",
-        "@angular/common": "~7.2.0",
-        "@angular/compiler": "~7.2.0",
-        "@angular/core": "~7.2.0",
-        "@angular/forms": "~7.2.0",
-        "@angular/material": "^9.2.0",
-```
-
-Since we have Angular 7, we actually need to install Material 7. Duncan did actually point this out at the top of section 6: _Always use the same Major version of Material as your Angular CLI and packages._
-
-Manually changed those imports to 7.0.0. Then got this error running yar (same as npm i by the way):
-
-```bash
-gyp ERR! configure error
-gyp ERR! stack Error: Command failed: C:\\Windows\\py.exe -c import sys; print \"%s.%s.%s\" % sys.version_info[:3];
-gyp ERR! stack   File \"<string>\", line 1
-gyp ERR! stack     import sys; print \"%s.%s.%s\" % sys.version_info[:3];
-gyp ERR! stack SyntaxError: invalid syntax
-gyp ERR! stack     at ChildProcess.exithandler (child_process.js:304:12)
-```
-
-However, this does not stop the serve and we get our styles, even with the separate imports. I was thinking I would have to revert all those import changes. Thanks Dunkan. Sorry about the earlier comment. There is even a link to some [flex examples](https://tburleson-layouts-demos.firebaseapp.com/#/docs).
-
-Getting to the enterprise stuff, mainly, forms.
-
-A nice comment Duncan makes at the start is great: _To save injecting the formBuilder and keeping this a presentational component with no injected dependencies we can just new up a simple FormGroup. You can read more about it here._
-
-He's talking React there and functional components. I mean, keeping the constructor clear of injections as much as possible, and reducing member variables is the way to keep Angular from getting too "classy". I mean, a form group is like state management for a particular part of the app. Hello Redux.
-
-A few errors to get through:
-
-```bash
-compiler.js:2430 Uncaught Error: Unexpected module 'ReactiveFormsModule' declared by the module 'AuthModule'. Please add a @Pipe/@Directive/@Component annotation.
-```
-
-Also, this line:
-
-```bash
-  <form [formGroup]="loginForm" fxLayout="column" fxLayoutAlign="center none">
-```
-
-Causes this VSCode squiggly mouseover error:
-
-```bash
-Can't bind to 'formGroup' since it isn't a known property of 'form'.
-```
-
-Should ReactiveFormsModule be in the imports, not the declarations? This went away after opening a different project in VSCode and then switching back here again. Faster than a restart.
-
-Next, step 8 - Layout Lib and BehaviorSubjects.
-
-```bash
-ng g lib layout --prefix app
-ng g c containers/layout --project=layout
-warning Lockfile has incorrect entry for "@angular/flex-layout@^7.0.0". Ignoring it.
-? Please choose a version of "@angular/flex-layout" from this list: (Use arrow keys)
-The later version 7 choice on the list was 7.0.0-beta-24.  In fact all choices were beta.  If this was for work I would actually look into this a bit more.
-```
-
-Getting the gyp configure error which ends like this:
-
-```bash
-gyp ERR! stack Error: Command failed: C:\\Windows\\py.exe -c import sys; print \"%s.%s.%s\" % sys.C:\\Users\\timof\\repos\\timofeysie\\quallasuyu\\node_modules\\@angular-devkit\\build-angular\\node_modules\\node-sass
-```
-
-Might just need to rebuild node-sass? As it is, the new layout "lib" is there and the app compiles and runs.
-
-There are a few typos and mistakes on this step. Duncan! But, we do get some juicy stuff at the end when he says: _Extras: Convert Layout component into a pure container component Add a toolbar presentational component. Pass user into presentational component via inputs._
-
-That's the functional stuff coming out again. Good idea. Except, who here is ready to get on with the NgRx state management implementation? I am! Only one more step to go: step 9 - Route Guards and Products Lib.
-
-```bash
-ng g lib products --routing --lazy --prefix=app --parent-module=apps/customer-portal/src/app/app.module.ts
-ng g c containers/products --project=products
-ng g guard guards/auth/auth --project=auth
-```
-
-Again had to choose the version and see the gyp error on the products generation line up there.
-I chose a version of "@angular/flex-layout" from this list: 7.0.0-beta.24 again.
-
-I saw this in the code for the previous section but there was no mention of adding it in any of the steps so far:
-
-```bash
-import { NxModule } from '@nrwl/nx';
-```
-
-Looks like it first showed up in step 6 when adding Material. It doesn't show up in the "// Added" comments that usually accompany new lines of code in the articles. It is a pretty long tutorial, and high difficulty level, so there's a lot to cover. I don't hold it against Duncan at all. It's just it pays to pay attention to the quality of samples from the internet to weigh the veracity of the concepts being used. Knowing Duncan personally through meetups, I can vouch for the accuracy of the material. However, again in step 9 there are some silly errors in the docs, such as repeated and unused imports. I know editing is hard. I don't like to edit which is why I never want to go the extra steps to publish any blogs although these readme files are almost blogs in themselves. It's good to be reminded of the level of work needed to produce a tutorial of this length, and what users feel like about the last 1% of editing.
-
-The auth guard generation also asked some questions:
-_? Which interfaces would you like to implement? CanActivate_. There are other interfaces to implement, but that is the only one used in the sample code.
-
-Again there are Extras in this step, such as "Add logout functionality" and "Add angular interceptor".
-
-If we want to update the auth service to set a token in local storage, we can come back to this later.
-
-Finally, [step 10: NgRx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/10-ngrx-introduction)
-
-### Create the server
-
-```bash
-npm i json-server ts-node --save-dev
-```
-
-After problems with npm in a mono-repo setting, the new rule is yarn every time. There is a package-lock and a yarn.lock file already. Should package-lock go? The warning says:
-
-```bash
-warning package-lock.json found. Your project contains lock files generated by tools other than Yarn. It is advised not to mix package managers in order to avoid resolution inconsistencies caused by un-synchronized lock files. To clear this warning, remove package-lock.json.
-```
-
-So, yes, it should go.
-
-Without much explanation, we create a mock backend and it's on to 5 - Angular Services.
-
-```bash
-ng g service services/auth/auth --project=auth
-```
-
-The login component has this code with the comment: _.subscribe() is needed to make sure the observer is registered with the observable returned from our AuthService. Later in the workshop we will learn to use NgRx to get entities from a server, but for now this is normal angular code without NgRx_
-
-```TypeScript
-this.authService.login(authenticate).subscribe();
-```
-
-Looking forward to that NgRx part!
-
-In the meantime, the serve is failing due to this:
-
-```bash
-ERROR in libs/auth/src/lib/components/login-form/login-form.component.ts(2,30): error TS2307: Cannot find module '@myorg/data-models'.
-libs/auth/src/lib/containers/login/login.component.ts(3,30): error TS2307: Cannot find module '@myorg/data-models'.
-libs/auth/src/lib/services/auth/auth.service.ts(2,30): error TS2307: Cannot find module '@myorg/data-models'.
-```
-
-I'm pretty sure this was running before. There is a list of myorg indexes in the tsconfig.json file. Try adding it there.
-
-```bash
-...
-      "@myorg/auth": ["libs/auth/src/index.ts"],
-      "@myorg/data-models": ["libs/data-models/src/index.ts"]
-```
-
-That doesn't help. Also, it's not in the complete tutorial code. The only thing needed seems to be a type definition .d.ts file and an index exporting it. Fine. We already have a data lib for the same purpose that has a todo interface in it. Just add the authentication interface there and move on.
-
-```bash
-npm install @angular/material @angular/cdk @angular/flex-layout @angular/animations
-yarn add @angular/material @angular/cdk @angular/flex-layout @angular/animations
-```
-
-There was no indication of the kind of component lib to use. Just assuming Angular, but Duncan, dude, you could do a bit better with the explanations.
-
-```bash
-? What framework should this library use? Angular    [ https://angular.io/ ]
-```
-
-Next issue:
-
-```bash
-ERROR in libs/material/src/lib/material.module.ts(16,8): error TS2306: File 'C:/Users/timof/repos/timofeysie/quallasuyu/node_modules/@angular/material/index.d.ts' is not a module.
-```
-
-Thanks to [this SO answer](https://stackoverflow.com/questions/58594311/angular-material-index-d-ts-is-not-a-module), we know that it's a Angular 9 breaking change probably for tree shaking purposes. So instead of doing a single line import with stuff like this:
-
-```bash
-import {
-  ...
-  MatSelectModule
-} from '@angular/material';
-```
-
-We have to do this:
-
-```bash
-...
-import { MatSelectModule } from '@angular/material/select';
-```
-
-Then however, there are more errors:
-
-```bash
-ERROR in node_modules/@angular/cdk/coercion/array.d.ts(10,60): error TS1005: ',' expected.
-node_modules/@angular/cdk/coercion/array.d.ts(10,61): error TS1005: ',' expected.
-node_modules/@angular/cdk/coercion/array.d.ts(10,75): error TS1144: '{' or ';' expected.
-node_modules/@angular/cdk/coercion/array.d.ts(10,77): error TS1011: An element access expression should take an argument.
-```
-
-We may not be so lucky this time, the only whiff of this on Google is this [as yet unanswered question](https://stackoverflow.com/questions/60949170/cannot-import-matdialogmodule-in-app-module). The asker has an Angular version mismatch:
-
-```TypeScript
-        "@angular/animations": "^7.2.16",
-        "@angular/cdk": "^9.2.0",
-        "@angular/common": "~7.2.0",
-        "@angular/compiler": "~7.2.0",
-        "@angular/core": "~7.2.0",
-        "@angular/forms": "~7.2.0",
-        "@angular/material": "^9.2.0",
-```
-
-Since we have Angular 7, we actually need to install Material 7. Duncan did actually point this out at the top of section 6: _Always use the same Major version of Material as your Angular CLI and packages._
-
-Manually changed those imports to 7.0.0. Then got this error running yar (same as npm i by the way):
-
-```bash
-gyp ERR! configure error
-gyp ERR! stack Error: Command failed: C:\\Windows\\py.exe -c import sys; print \"%s.%s.%s\" % sys.version_info[:3];
-gyp ERR! stack   File \"<string>\", line 1
-gyp ERR! stack     import sys; print \"%s.%s.%s\" % sys.version_info[:3];
-gyp ERR! stack SyntaxError: invalid syntax
-gyp ERR! stack     at ChildProcess.exithandler (child_process.js:304:12)
-```
-
-However, this does not stop the serve and we get our styles, even with the separate imports. I was thinking I would have to revert all those import changes. Thanks Dunkan. Sorry about the earlier comment. There is even a link to some [flex examples](https://tburleson-layouts-demos.firebaseapp.com/#/docs).
-
-Getting to the enterprise stuff, mainly, forms.
-
-A nice comment Duncan makes at the start is great: _To save injecting the formBuilder and keeping this a presentational component with no injected dependencies we can just new up a simple FormGroup. You can read more about it here._
-
-He's talking React there and functional components. I mean, keeping the constructor clear of injections as much as possible, and reducing member variables is the way to keep Angular from getting too "classy". I mean, a form group is like state management for a particular part of the app. Hello Redux.
-
-A few errors to get through:
-
-```bash
-compiler.js:2430 Uncaught Error: Unexpected module 'ReactiveFormsModule' declared by the module 'AuthModule'. Please add a @Pipe/@Directive/@Component annotation.
-```
-
-Also, this line:
-
-```bash
-  <form [formGroup]="loginForm" fxLayout="column" fxLayoutAlign="center none">
-```
-
-Causes this VSCode squiggly mouseover error:
-
-```bash
-Can't bind to 'formGroup' since it isn't a known property of 'form'.
-```
-
-Should ReactiveFormsModule be in the imports, not the declarations? This went away after opening a different project in VSCode and then switching back here again. Faster than a restart.
-
-Next, step 8 - Layout Lib and BehaviorSubjects.
-
-```bash
-ng g lib layout --prefix app
-ng g c containers/layout --project=layout
-```
-
-warning Lockfile has incorrect entry for "@angular/flex-layout@^7.0.0". Ignoring it.
-? Please choose a version of "@angular/flex-layout" from this list: (Use arrow keys)
-The later version 7 choice on the list was 7.0.0-beta-24. In fact all choices were beta. If this was for work I would actually look into this a bit more.
-
-Getting the gyp configure error which ends like this:
-
-```bash
-gyp ERR! stack Error: Command failed: C:\\Windows\\py.exe -c import sys; print \"%s.%s.%s\" % sys.C:\\Users\\timof\\repos\\timofeysie\\quallasuyu\\node_modules\\@angular-devkit\\build-angular\\node_modules\\node-sass
-```
-
-Might just need to rebuild node-sass? As it is, the new layout "lib" is there and the app compiles and runs.
-
-There are a few typos and mistakes on this step. Duncan! But, we do get some juicy stuff at the end when he says: _Extras: Convert Layout component into a pure container component Add a toolbar presentational component. Pass user into presentational component via inputs._
-
-That's the functional stuff coming out again. Good idea. Except, who here is ready to get on with the NgRx state management implementation? I am! Only one more step to go: step 9 - Route Guards and Products Lib.
-
-```bash
-ng g lib products --routing --lazy --prefix=app --parent-module=apps/customer-portal/src/app/app.module.ts
-ng g c containers/products --project=products
-ng g guard guards/auth/auth --project=auth
-```
-
-Again had to choose the version and see the gyp error on the products generation line up there.
-I chose a version of "@angular/flex-layout" from this list: 7.0.0-beta.24 again.
-
-I saw this in the code for the previous section but there was no mention of adding it in any of the steps so far:
-
-```bash
-import { NxModule } from '@nrwl/nx';
-```
-
-Looks like it first showed up in step 6 when adding Material. It doesn't show up in the "// Added" comments that usually accompany new lines of code in the articles. It is a pretty long tutorial, and high difficulty level, so there's a lot to cover. I don't hold it against Duncan at all. It's just it pays to pay attention to the quality of samples from the internet to weigh the veracity of the concepts being used. Knowing Duncan personally through meetups, I can vouch for the accuracy of the material. However, again in step 9 there are some silly errors in the docs, such as repeated and unused imports. I know editing is hard. I don't like to edit which is why I never want to go the extra steps to publish any blogs although these readme files are almost blogs in themselves. It's good to be reminded of the level of work needed to produce a tutorial of this length, and what users feel like about the last 1% of editing.
-
-The auth guard generation also asked some questions:
-_? Which interfaces would you like to implement? CanActivate_. There are other interfaces to implement, but that is the only one used in the sample code.
-
-Again there are Extras in this step, such as "Add logout functionality" and "Add angular interceptor".
-
-If we want to update the auth service to set a token in local storage, we can come back to this later.
-
-Finally, [step 10: NgRx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/10-ngrx-introduction)
-
-#
-
-# Adding NgRx to the customer portal
+### Adding NgRx to the customer portal
 
 ```bash
 > ng g ngrx app --module=apps/customer-portal/src/app/app.module.ts  --onlyEmptyRoot

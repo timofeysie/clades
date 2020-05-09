@@ -59,7 +59,8 @@
     "zone.js": "^0.10.2",
     "@ionic/react": "5.0.7",
     "ionicons": "5.0.1",
-    "@ionic/react-router": "5.0.7"
+    "@ionic/react-router": "5.0.7",
+    "@ngrx/entity": "9.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.901.0",
@@ -98,6 +99,8 @@
     "@nxtend/ionic-react": "*",
     "@testing-library/user-event": "10.0.1",
     "@testing-library/jest-dom": "5.5.0",
-    "@testing-library/cypress": "6.0.0"
+    "@testing-library/cypress": "6.0.0",
+    "@ngrx/schematics": "9.0.0",
+    "@ngrx/store-devtools": "9.0.0"
   }
 }
