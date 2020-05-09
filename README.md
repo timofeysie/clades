@@ -1414,19 +1414,51 @@ This line is commented out in the workshop with the note: *Due to issue with Sto
 metaReducers: !environment.production ? [] : [],
 ```
 
-Next:
-
-Add NgRx Auth lib making it a state state
+#### Add NgRx Auth lib state
 
 ```bash
-nx g @nrwl/angular:ngrx auth --module=libs/auth/src/lib/auth.module.ts
+nx g @nrwl/angular:ngrx --module=libs/auth/src/lib/auth.module.ts --minimal false
+? What name would you like to use for the NgRx feature state? An example would be "users". auth
+? Is this the root state of the application? No
+? Would you like to use a Facade with your NgRx state? No
+CREATE libs/auth/src/lib/+state/auth.actions.ts (424 bytes)
+CREATE libs/auth/src/lib/+state/auth.effects.spec.ts (1156 bytes)
+CREATE libs/auth/src/lib/+state/auth.effects.ts (846 bytes)
+CREATE libs/auth/src/lib/+state/auth.models.ts (118 bytes)
+CREATE libs/auth/src/lib/+state/auth.reducer.spec.ts (1085 bytes)
+CREATE libs/auth/src/lib/+state/auth.reducer.ts (1368 bytes)
+CREATE libs/auth/src/lib/+state/auth.selectors.spec.ts (1765 bytes)
+CREATE libs/auth/src/lib/+state/auth.selectors.ts (1108 bytes)
+UPDATE libs/auth/src/lib/auth.module.ts (2608 bytes)
 ```
 
-The previous command was:
+Using just the *ng* CLI command from the workshop will result in the error:
 
 ```bash
 ng generate ngrx auth --module=libs/auth/src/lib/auth.module.ts
+The generate command requires to be run in an Angular project, but a project definition could not be found.
 ```
+
+If you are curious about the root state question, if you answered yes to that and ran the app it brings up this error:
+
+```bash
+ERROR in libs/auth/src/lib/auth.module.ts:14:29 - error TS2307: Cannot find module '../environments/environment'.
+14 import { environment } from '../environments/environment';
+```
+
+There is an */environments/environments* file in the Stromatolites project:
+
+#### **`apps\stromatolites\src\environments\environment.prod.ts`**
+
+```js
+export const environment = {
+  production: true
+};
+```
+
+If you answer *no*, no environment file is used and the app will run as expected.
+
+To skip details about adding a base implementation of NgRx to an app and get on with the next step, go to the *Strong Typing the State and Actions* section.
 
 #### The previous method of adding NgRx
 
@@ -1776,6 +1808,16 @@ describe('Items Selectors', () => {
 });
 ```
 
+#### Adding strong typing to the state and actions
+
+This is from [part 12](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/12-ngrx-libs-and-action-creators) of the workshop tutorial.
+
+
+
+
+
+
+
 #### Workflow shortcuts for Stromatolites
 
 Just a reminder of what needs to be run when working on this project.
@@ -1783,6 +1825,7 @@ Just a reminder of what needs to be run when working on this project.
 ```bash
 yarn run server
 nx serve stromatolites
+nx test auth --watch
 nx test stromatolites --watch
 nx test layout --watch
 nx test products --watch
