@@ -1370,6 +1370,375 @@ It doesn't seem right to have to type state.counter.counter.
 
 There needs to be more work done to reconcile the official example counter code and Duncan's code.  Since this is not the goal of the project at the moment, we will leave it for now and add it to the to do list to be triaged along with all the other needed tasks.
 
+### [Adding NgRx](https://github.com/timofeysie/clades/issues/20)
+
+This is what we came for.  It's been a month or two since covering this section the first time using Nrwl 7, so setting up ngrx in a new app will need a refresher.
+
+Find the original Duncan Hunter section here: [11 - Adding NgRx to Nx App](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/11-adding-ngrx-to-nx-app)
+
+The nx command for this [shown in the official docs](https://nx.dev/react/plugins/angular/schematics/ngrx) is:
+
+```bash
+nx generate ngrx ...
+nx g @nrwl/angular:ngrx --module=apps/stromatolites/src/app/app.module.ts
+```
+
+The [Ngrx docs](https://ngrx.io/guide/store/install) say:
+
+```bash
+yarn add @ngrx/store
+ng add @ngrx/store
+ng add @ngrx/store --minimal false
+```
+
+Duncan uses the module *module* option:  *The path to NgModule where the feature state will be registered. The host directory will create/use the new state directory.*
+
+Here is the command Duncan shows:
+
+```bash
+ng g ngrx app --module=apps/customer-portal/src/app/app.module.ts  --onlyEmptyRoot
+```
+
+In the Ngrx docs, there is no mention of the onlyEmptyRoot flag.
+onlyEmptyRoot (Default: false) Deprecated, use minimal. Do not generate any files. Only generate StoreModule.forRoot and EffectsModule.forRoot (e.g., --onlyEmptyRoot).
+
+I have notes on all these methods for adding ngrx:
+
+```bash
+ng g @nrwl/angular:ngrx <featurename> --module=<path-to-module> --defaults [options]
+ng add @ngrx/store
+ng g store State --root --module app.module.ts
+An unhandled exception occurred: Schematic "store" not found in collection "@schematics/angular".
+See "C:\Users\timof\AppData\Local\Temp\ng-qoKM4A\angular-errors.log" for further details.
+```
+
+Add the vanilla NgRx approach:
+
+```bash
+ng g store State --root --module app.module.ts
+```
+
+#### Generating base stores
+
+Generating a base store and set of Redux classes is a good guide for the current state of NgRx.  The code for these commands aside from the workshop code can be found on the *base-store* branch in the repo.
+
+```bash
+nx g @nrwl/angular:ngrx --module=apps/stromatolites/src/app/app.module.ts
+? What name would you like to use for the NgRx feature state? An example would be "users" items
+? Is this the root state of the application? (y/N)  
+? Would you like to use a Facade with your NgRx state? No
+UPDATE apps/stromatolites/src/app/app.module.ts (1797 bytes)
+UPDATE package.json (3386 bytes)
+```
+
+(What's with the question marks at the beginning of the sentence.  It's kind of spanish)
+
+The following is added to the app.module file.
+
+```js
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
+...
+    AuthModule,
+    LayoutModule,
+    StoreModule.forRoot(
+      {},
+      {
+        metaReducers: !environment.production ? [] : [],
+        runtimeChecks: {
+          strictActionImmutability: true,
+          strictStateImmutability: true
+        }
+      }
+    ),
+    EffectsModule.forRoot([]),
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
+    StoreRouterConnectingModule.forRoot()
+```
+
+I was expecting a little more after all those questions.
+
+What happens with the   option?
+
+```bash
+nx g @nrwl/angular:ngrx --module=apps/stromatolites/src/app/app.module.ts --minimal false
+? What name would you like to use for the NgRx feature state? An example would be "users". items
+? Is this the root state of the application? Yes
+? Would you like to use a Facade with your NgRx state? No
+√ Packages installed successfully.
+CREATE apps/stromatolites/src/app/+state/items.actions.ts (385 bytes)
+CREATE apps/stromatolites/src/app/+state/items.effects.spec.ts (1111 bytes)
+CREATE apps/stromatolites/src/app/+state/items.effects.ts (807 bytes)
+CREATE apps/stromatolites/src/app/+state/items.models.ts (112 bytes)
+CREATE apps/stromatolites/src/app/+state/items.reducer.spec.ts (1034 bytes)
+CREATE apps/stromatolites/src/app/+state/items.reducer.ts (1280 bytes)
+CREATE apps/stromatolites/src/app/+state/items.selectors.spec.ts (1678 bytes)
+CREATE apps/stromatolites/src/app/+state/items.selectors.ts (1046 bytes)
+UPDATE apps/stromatolites/src/app/app.module.ts (1996 bytes)
+UPDATE package.json (3386 bytes)
+```
+
+Now the items are added to the app.module.ts file:
+
+```js
+    EffectsModule.forRoot([ItemsEffects]),
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
+    StoreRouterConnectingModule.forRoot(),
+    StoreModule.forFeature(fromItems.ITEMS_FEATURE_KEY, fromItems.reducer)
+```
+
+That's what one would expect.  Then there are actions, effects, models, reducers and selectors.  For reference they will be all included here.
+
+#### **`apps\stromatolites\src\app\+state\items.actions.ts`**
+
+```js
+export const loadItemsSuccess = createAction(
+  '[Items] Load Items Success',
+  props<{ items: ItemsEntity[] }>()
+);
+```
+
+#### **`apps\stromatolites\src\app\+state\items.effects.ts`**
+
+```js
+export class ItemsEffects {
+  loadItems$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ItemsActions.loadItems),
+      fetch({
+        run: action => {
+          // Your custom service 'load' logic goes here. For now just return a success action...
+          return ItemsActions.loadItemsSuccess({ items: [] });
+        },
+
+        onError: (action, error) => {
+          console.error('Error', error);
+          return ItemsActions.loadItemsFailure({ error });
+        }
+      })
+    )
+  );
+```
+
+#### **`apps\stromatolites\src\app\+state\items.effects.spec.ts`**
+
+```js
+import { TestBed, async } from '@angular/core/testing';
+import { Observable } from 'rxjs';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { provideMockStore } from '@ngrx/store/testing';
+import { NxModule, DataPersistence } from '@nrwl/angular';
+import { hot } from '@nrwl/angular/testing';
+import { ItemsEffects } from './items.effects';
+import * as ItemsActions from './items.actions';
+
+describe('ItemsEffects', () => {
+  let actions: Observable<any>;
+  let effects: ItemsEffects;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [NxModule.forRoot()],
+      providers: [
+        ItemsEffects,
+        DataPersistence,
+        provideMockActions(() => actions),
+        provideMockStore()
+      ]
+    });
+
+    effects = TestBed.get(ItemsEffects);
+  });
+
+  describe('loadItems$', () => {
+    it('should work', () => {
+      actions = hot('-a-|', { a: ItemsActions.loadItems() });
+
+      const expected = hot('-a-|', {
+        a: ItemsActions.loadItemsSuccess({ items: [] })
+      });
+
+      expect(effects.loadItems$).toBeObservable(expected);
+    });
+  });
+});
+```
+
+#### **`apps\stromatolites\src\app\+state\items.effects.ts`.**
+
+```bash
+export interface ItemsEntity {
+  id: string | number; // Primary ID
+}
+```
+
+#### **`apps\stromatolites\src\app\+state\items.reducer.ts`**
+
+```js
+export const ITEMS_FEATURE_KEY = 'items';
+
+export interface State extends EntityState<ItemsEntity> {
+  selectedId?: string | number; // which Items record has been selected
+  loaded: boolean; // has the Items list been loaded
+  error?: string | null; // last none error (if any)
+}
+
+export interface ItemsPartialState {
+  readonly [ITEMS_FEATURE_KEY]: State;
+}
+
+export const itemsAdapter: EntityAdapter<ItemsEntity> = createEntityAdapter<
+  ItemsEntity
+>();
+
+export const initialState: State = itemsAdapter.getInitialState({
+  // set initial required properties
+  loaded: false
+});
+
+const itemsReducer = createReducer(
+  initialState,
+  on(ItemsActions.loadItems, state => ({
+    ...state,
+    loaded: false,
+    error: null
+  })),
+  on(ItemsActions.loadItemsSuccess, (state, { items }) =>
+    itemsAdapter.addAll(items, { ...state, loaded: true })
+  ),
+  on(ItemsActions.loadItemsFailure, (state, { error }) => ({ ...state, error }))
+);
+```
+
+#### **`apps\stromatolites\src\app\+state\items.reducer.spec.ts`**
+
+```js
+import { ItemsEntity } from './items.models';
+import * as ItemsActions from './items.actions';
+import { State, initialState, reducer } from './items.reducer';
+
+describe('Items Reducer', () => {
+  const createItemsEntity = (id: string, name = '') =>
+    ({
+      id,
+      name: name || `name-${id}`
+    } as ItemsEntity);
+
+  beforeEach(() => {});
+
+  describe('valid Items actions', () => {
+    it('loadItemsSuccess should return set the list of known Items', () => {
+      const items = [
+        createItemsEntity('PRODUCT-AAA'),
+        createItemsEntity('PRODUCT-zzz')
+      ];
+      const action = ItemsActions.loadItemsSuccess({ items });
+
+      const result: State = reducer(initialState, action);
+
+      expect(result.loaded).toBe(true);
+      expect(result.ids.length).toBe(2);
+    });
+  });
+
+  describe('unknown action', () => {
+    it('should return the previous state', () => {
+      const action = {} as any;
+
+      const result = reducer(initialState, action);
+
+      expect(result).toBe(initialState);
+    });
+  });
+});
+```
+
+#### **`apps\stromatolites\src\app\+state\items.selectors.ts`**
+
+```js
+// Lookup the 'Items' feature state managed by NgRx
+export const getItemsState = createFeatureSelector<ItemsPartialState, State>(
+  ITEMS_FEATURE_KEY
+);
+
+const { selectAll, selectEntities } = itemsAdapter.getSelectors();
+
+export const getItemsLoaded = createSelector(
+  getItemsState,
+  (state: State) => state.loaded
+);
+```
+
+#### **`apps\stromatolites\src\app\+state\items.selectors.spec.ts`**
+
+```js
+import { ItemsEntity } from './items.models';
+import { State, itemsAdapter, initialState } from './items.reducer';
+import * as ItemsSelectors from './items.selectors';
+
+describe('Items Selectors', () => {
+  const ERROR_MSG = 'No Error Available';
+  const getItemsId = it => it['id'];
+  const createItemsEntity = (id: string, name = '') =>
+    ({
+      id,
+      name: name || `name-${id}`
+    } as ItemsEntity);
+
+  let state;
+
+  beforeEach(() => {
+    state = {
+      items: itemsAdapter.addAll(
+        [
+          createItemsEntity('PRODUCT-AAA'),
+          createItemsEntity('PRODUCT-BBB'),
+          createItemsEntity('PRODUCT-CCC')
+        ],
+        {
+          ...initialState,
+          selectedId: 'PRODUCT-BBB',
+          error: ERROR_MSG,
+          loaded: true
+        }
+      )
+    };
+  });
+
+  describe('Items Selectors', () => {
+    it('getAllItems() should return the list of Items', () => {
+      const results = ItemsSelectors.getAllItems(state);
+      const selId = getItemsId(results[1]);
+
+      expect(results.length).toBe(3);
+      expect(selId).toBe('PRODUCT-BBB');
+    });
+
+    it('getSelected() should return the selected Entity', () => {
+      const result = ItemsSelectors.getSelected(state);
+      const selId = getItemsId(result);
+
+      expect(selId).toBe('PRODUCT-BBB');
+    });
+
+    it("getItemsLoaded() should return the current 'loaded' status", () => {
+      const result = ItemsSelectors.getItemsLoaded(state);
+
+      expect(result).toBe(true);
+    });
+
+    it("getItemsError() should return the current 'error' state", () => {
+      const result = ItemsSelectors.getItemsError(state);
+
+      expect(result).toBe(ERROR_MSG);
+    });
+  });
+});
+```
+
 #### Workflow shortcuts for Stromatolites
 
 Just a reminder of what needs to be run when working on this project.
