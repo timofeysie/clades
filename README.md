@@ -10,7 +10,8 @@ It also has the Stratum app with unit tests for the counter example to create a 
 
 ## Table of contents
 
-- [Testing a dispatch action](#testing-a-dispatch-action)
+- [Storybook integration with Nrwl](#storybook-integration-with-Nrwl)
+W- [Testing a dispatch action](#testing-a-dispatch-action)
 - [The @nxtend/ionic-react plugin](#the-@nxtend/ionic-react-plugin)
 - [Re-implementing the Duncan](#re-implementing-the-Duncan)
 - [Testing Ngrx](#testing-ngrx)
