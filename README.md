@@ -1808,13 +1808,288 @@ describe('Items Selectors', () => {
 });
 ```
 
-#### Adding strong typing to the state and actions
+#### [Adding strong typing to the state and actions](https://github.com/timofeysie/clades/issues/21)
 
 This is from [part 12](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/12-ngrx-libs-and-action-creators) of the workshop tutorial.
 
+Replace the automatically generated actions:
 
+```js
+[Auth] Load Auth Success
+[Auth] Load Auth Failure
+```
 
+with these:
 
+```js
+[Auth Page] Login
+[Auth API] Login Success
+[Auth API] Login Fail
+```
+
+The workshop action creation function looks like this:
+
+```js
+export class Login implements Action {
+  readonly type = AuthActionTypes.Login;
+  constructor(public payload: Authenticate) {}
+}
+```
+
+The new way of creating actions with the latest NgRx is like this:
+
+```js
+export const loadAuthSuccess = createAction(
+  '[Auth] Load Auth Success',
+  props<{ auth: AuthEntity[] }>()
+);
+```
+
+I'm guessing then, along with using the enum as seen in the workshop, we can do something like this:
+
+```js
+export const loadAuth = createAction(
+  AuthActionTypes.Login,
+  props<{ payload: Authenticate }> ()
+);
+```
+
+The official docs say:
+*The createAction function returns a function, that when called returns an object in the shape of the Action interface. The props method is used to define any additional metadata needed for the handling of the action. Action creators provide a consistent, type-safe way to construct an action that is being dispatched.*
+
+Unlike the previous version, no export line is needed at the end of the class.
+
+#### Reducers
+
+Next, in the reducer file, add the default state and interface.
+
+```js
+interface AuthData {
+  loading: boolean;
+  user: User;
+  error: '';
+}
+export interface AuthState {
+  readonly auth: AuthData;
+}
+```
+
+In this part, we only get a portion of the reducer.  
+
+The rest of the file is quite different from the [Quallasuyu](https://github.com/timofeysie/quallasuyu/blob/master/libs/auth/src/lib/%2Bstate/auth.reducer.ts) repo.
+
+```js
+export const initialState: AuthData = {
+  error: '',
+  user: null,
+  loading: false
+};
+export function authReducer(
+  state = initialState,
+  action: AuthActions
+): AuthData {
+  switch (action.type) {
+    case AuthActionTypes.Login:
+      return { ...state, loading: true };
+    case AuthActionTypes.LoginSuccess: {
+      return { ...state, user: action.payload, loading: false };
+    }
+    case AuthActionTypes.LoginFail: {
+      return { ...state, user: null, loading: false };
+    }
+    default:
+      return state;
+  }
+}
+```
+
+There are differences in the State, authAdapter, and authReducer
+The automatically generated part is:
+
+```js
+export interface State extends EntityState<AuthEntity> {
+  selectedId?: string | number; // which Auth record has been selected
+  loaded: boolean; // has the Auth list been loaded
+  error?: string | null; // last none error (if any)
+}
+export interface AuthPartialState {
+  readonly [AUTH_FEATURE_KEY]: State;
+}
+export const authAdapter: EntityAdapter<AuthEntity> = createEntityAdapter<
+  AuthEntity
+>();
+const authReducer = createReducer(
+  initialState,
+  on(AuthActions.loadAuth, state => ({ ...state, loaded: false, error: null })),
+  on(AuthActions.loadAuthSuccess, (state, { auth }) =>
+    authAdapter.addAll(auth, { ...state, loaded: true })
+  ),
+  on(AuthActions.loadAuthFailure, (state, { error }) => ({ ...state, error }))
+);
+export function reducer(state: State | undefined, action: Action) {
+  return authReducer(state, action);
+}
+```
+
+The workshop initial state and reducer look like this:
+
+```js
+export function authReducer(
+  state = initialState,
+  action: AuthActions
+): AuthData {
+  switch (action.type) {
+    case AuthActionTypes.Login:
+      return { ...state, loading: true };
+    case AuthActionTypes.LoginSuccess: {
+      return { ...state, user: action.payload, loading: false }; }
+    case AuthActionTypes.LoginFail: {
+      return { ...state, user: null, loading: false };}
+    default:
+      return state;
+  }
+}
+```
+
+#### The Effect
+
+The link in the next part on effects details effects with routing from [NgRx versions 6.x and older](https://github.com/ngrx/platform/blob/master/docs/router-store/api.md#navigation-actions).  Currently they are at 9.1.2.
+
+The updated link is just to the entire project ngrx.io, not a specific document.  So it's up to us to find the right documentation and convert the old workshop code into the current version if NgRx.  The current [docs are here](https://ngrx.io/guide/router-store) by the way.  Config shows using an routerReducer in app.module.
+
+The old effect from the workshop:
+
+```js
+export class AuthEffects {
+  @Effect()
+  login$ = this.actions$.pipe(
+    ofType(AuthActionTypes.Login),
+    mergeMap((action: authActions.Login) =>
+      this.authService
+        .login(action.payload)
+        .pipe(
+          map((user: User) => new authActions.LoginSuccess(user)),
+          catchError(error => of(new authActions.LoginFail(error)))
+        )
+    )
+  );
+  ...
+```
+
+The automatically generated by Nrwl 9:
+
+```js
+export class AuthEffects {
+  loadAuth$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.loadAuth),
+      fetch({
+        run: action => {
+          // Your custom service 'load' logic goes here. For now just return a success action...
+          return AuthActions.loadAuthSuccess({ auth: [] });
+        },
+
+        onError: (action, error) => {
+          console.error('Error', error);
+          return AuthActions.loadAuthFailure({ error });
+        }
+      })
+    )
+  );
+  ...
+```
+
+So yeah, pretty different.  Having trouble making an updated version.
+
+There is no effect in the counter example from the stratum app.
+
+The docs say *Effects decrease the responsibility of the component.*  I suppose the counter example has too little responsibility.  The official example [here] shows more like the old version:
+
+```js
+export class MovieEffects {
+  loadMovies$ = createEffect(() => this.actions$.pipe(
+    ofType('[Movies Page] Load Movies'),
+    mergeMap(() => this.moviesService.getAll()
+      .pipe(
+        map(movies => ({ type: '[Movies API] Movies Loaded Success', payload: movies })),
+        catchError(() => EMPTY)
+      ))
+    )
+  );
+
+  constructor(
+    private actions$: Actions,
+    private moviesService: MoviesService
+  ) {}
+}
+```
+
+The reducer code is fleshed out [in the next part, titled "13 - NgRx Effects"](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/13-ngrx-effects).
+
+The reducer shown here has four parts:
+
+```js
+interface AuthData { }
+export interface AuthState { }
+export const initialState: AuthData = { }
+export function authReducer( )
+```
+
+Using the action the old way looks like this in the login.component.ts:
+
+```js
+this.store.dispatch(new authActions.Login(authenticate));
+```
+
+The new way of doing things looks like this:
+
+```js
+this.store.dispatch(login({ payload: authenticate }));
+```
+
+Then we have a problem of how to do things in the effect:
+
+```js
+.login(action.payload)
+              ^^^^^^^
+Property 'payload' does not exist on type 'AuthActionTypes.Login'.ts(2339)
+```
+
+Updating the first effect, this is looking good in that there are no TS errors:
+
+```js
+@Effect() login$ = this.actions$.pipe(
+  ofType(AuthActionTypes.Login),
+  fetch({
+    run: action => {
+      this.authService
+      .login(action)
+    },
+    onError: (action, error) => {
+      console.error('Error', error);
+      return AuthActions.loginFailure(error);
+    }
+  })
+);
+```
+
+However, will the login action get the user object as happens in the map function of the old workshop code?
+
+```js
+map((user: User) => new authActions.LoginSuccess(user)),
+```
+
+Compared to the old way of doing this, ```mergeMap((action: authActions.Login)``` is replaced by the shorter ```run: action```.
+
+The second one will need more work.  The workshop code shows:
+
+```js
+@Effect({ dispatch: false }) navigateToProfile$ = this.actions$.pipe(
+    ofType(AuthActionTypes.LoginSuccess),
+    map((action: authActions.LoginSuccess) => action.payload),
+    tap(() => this.router.navigate([`/products`]))
+  );
+```
 
 
 
