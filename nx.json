@@ -14,7 +14,13 @@
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"]
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e",
+          "build-storybook"
+        ]
       }
     }
   },
@@ -24,14 +30,18 @@
     },
     "clades-e2e": {
       "tags": [],
-      "implicitDependencies": ["clades"]
+      "implicitDependencies": [
+        "clades"
+      ]
     },
     "monophyletic": {
       "tags": []
     },
     "monophyletic-e2e": {
       "tags": [],
-      "implicitDependencies": ["monophyletic"]
+      "implicitDependencies": [
+        "monophyletic"
+      ]
     },
     "ui-header": {
       "tags": []
@@ -47,14 +57,18 @@
     },
     "stratum-e2e": {
       "tags": [],
-      "implicitDependencies": ["stratum"]
+      "implicitDependencies": [
+        "stratum"
+      ]
     },
     "stromatolites": {
       "tags": []
     },
     "stromatolites-e2e": {
       "tags": [],
-      "implicitDependencies": ["stromatolites"]
+      "implicitDependencies": [
+        "stromatolites"
+      ]
     },
     "auth": {
       "tags": []
@@ -73,10 +87,18 @@
     },
     "luca-e2e": {
       "tags": [],
-      "implicitDependencies": ["luca"]
+      "implicitDependencies": [
+        "luca"
+      ]
     },
     "products": {
       "tags": []
+    },
+    "ui-header-e2e": {
+      "tags": [],
+      "implicitDependencies": [
+        "ui-header"
+      ]
     }
   }
 }

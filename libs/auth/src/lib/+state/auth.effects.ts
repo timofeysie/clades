@@ -29,9 +29,9 @@ export class AuthEffects {
   );
 
   @Effect({ dispatch: false })
-  navigateToProfile $ = this.actions$.pipe(
-    ofType(AuthActionTypes.LoginSuccess),
-    map((action: loginSuccess) => action.payload),
+  navigateToProfile$ = this.actions$.pipe(
+    // ofType(AuthActionTypes.LoginSuccess),
+    // map((action: loginSuccess) => action.payload),
     tap(() => this.router.navigate([`/products`]))
   );
 
