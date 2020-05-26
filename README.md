@@ -11,7 +11,7 @@ It also has the Stratum app with unit tests for the counter example to create a 
 ## Table of contents
 
 - [Storybook integration with Nrwl](#storybook-integration-with-Nrwl)
-W- [Testing a dispatch action](#testing-a-dispatch-action)
+- [Testing a dispatch action](#testing-a-dispatch-action)
 - [The @nxtend/ionic-react plugin](#the-@nxtend/ionic-react-plugin)
 - [Re-implementing the Duncan](#re-implementing-the-Duncan)
 - [Testing Ngrx](#testing-ngrx)
@@ -31,6 +31,7 @@ nx serve luca # React Ionic test app
 nx serve monophyletic # serve the React front end
 nx serve stratum # Angular app with unit tests for the counter example
 nx serve stromatolites # Angular app for the updated Duncan workshop code
+nx run layout:storybook # run the storybook app
 nx test layout/products # test the layout or products libs used by stromatolites
 nx test stratum --watch # run Angular Jest unit tests
 nx test stromatolites --watch0
@@ -93,7 +94,7 @@ nx run project-name:storybook
 Running this on the ui-header lib looks like this:
 
 ```s
-nx g @nrwl/angular:storybook-configuration ui-header
+>nx g @nrwl/angular:storybook-configuration ui-header
 ? Configure a cypress e2e app to run against the storybook instance? Yes
 ? Automatically generate *.stories.ts files for components declared in this library? Ye
 s
@@ -127,6 +128,129 @@ webpack built 754292759cc5f8f5df43 in 15567ms
 Going to that url looks good but something is wrong.  The menu is trapped in a skeleton list of eternal loading and a message starts: *Sorry, but you either have no stories or none are selected somehow...*
 
 So I think it's safe to say that the promise to *Automatically generate .stories.ts files* didn't work out.
+
+```bash
+nx g @nrwl/angular:storybook-configuration stromatolites
+...
+Could not read apps/stromatolites/tsconfig.lib.json.
+```
+
+```bash
+>nx g @nrwl/angular:storybook-configuration layout
+...
+√ Packages installed successfully.
+CREATE .storybook/addons.js (42 bytes)
+CREATE .storybook/tsconfig.json (113 bytes)
+CREATE .storybook/webpack.config.js (396 bytes)
+CREATE libs/layout/.storybook/tsconfig.json (180 bytes)
+CREATE libs/layout/.storybook/addons.js (37 bytes)
+CREATE libs/layout/.storybook/config.js (220 bytes)
+CREATE libs/layout/.storybook/webpack.config.js (261 bytes)
+CREATE apps/layout-e2e/tslint.json (80 bytes)
+CREATE apps/layout-e2e/cypress.json (450 bytes)
+CREATE apps/layout-e2e/tsconfig.e2e.json (167 bytes)
+CREATE apps/layout-e2e/tsconfig.json (137 bytes)
+CREATE apps/layout-e2e/src/fixtures/example.json (80 bytes)
+CREATE apps/layout-e2e/src/plugins/index.js (832 bytes)
+CREATE apps/layout-e2e/src/support/commands.ts (1068 bytes)
+CREATE apps/layout-e2e/src/support/index.ts (599 bytes)
+CREATE libs/layout/src/lib/containers/layout/layout.component.stories.ts (224 bytes)
+CREATE apps/layout-e2e/src/integration/containers/layout/layout.component.spec.ts (201 bytes)
+UPDATE package.json (3493 bytes)
+UPDATE nx.json (1724 bytes)
+UPDATE libs/layout/tsconfig.lib.json (484 bytes)
+UPDATE workspace.json (30556 bytes)
+```
+
+But running this one is worse:
+
+```bash
+nx run layout:storybook
+[./node_modules/regenerator-runtime/runtime.js] 23.6 KiB {vendors~main}
+[./node_modules/webpack-hot-middleware/client.js?reload=true&quiet=true] 7.68 KiB {vendors~main}
+    + 993 hidden modules
+...
+ERROR in ./libs/layout/src/lib/containers/layout/layout.component.ts
+Module not found: Error: Can't resolve '@clades/auth' in 'C:\Users\timof\repos\timofeysie\clades\libs\layout\src\lib\containers\layout'
+ @ ./libs/layout/src/lib/containers/layout/layout.component.ts 4:0-43 25:57-68 25:88-99
+ @ ./libs/layout/src/lib/containers/layout/layout.component.stories.ts
+ @ ./libs/layout/src/lib sync \.stories\.(j|t)sx?$
+ @ ./libs/layout/.storybook/config.js
+ @ multi ./node_modules/@storybook/core/dist/server/common/polyfills.js ./node_modules/@storybook/core/dist/server/preview/globals.js ./libs/layout/.storybook/config.js ./node_modules/webpack-hot-middleware/client.js?reload=true&quiet=true
+
+ERROR in C:/Users/timof/repos/timofeysie/clades/libs/auth/src/lib/+state/auth.effects.ts
+ERROR in C:/Users/timof/repos/timofeysie/clades/libs/auth/src/lib/+state/auth.effects.ts(34,18):
+TS2749: 'loginSuccess' refers to a value, but is being used as a type here.
+```
+
+There was some unfinished work implementing effects there.  Big differences between the current way to use Ngrx and the previous Workshop code from a few years ago.
+
+I'm not sure why it can't resolve '@clades/auth', but storybook does find '@clades/data-models'.
+
+Regardless, getting rid of the auth references in that component gets rid of the error, but we are back to the *ERR! Could not find angular.json* situation
+
+Apparently, choosing the Nx CLI, there will be a workspace.json and if choosing Angular CLI, there will be a angular.json.  The man himself has this to say about it:
+
+```txt
+brandonroberts commented on Aug 13, 2019
+@ahnpnl if you're primarily using Angular, you should be using the ng commands like they are in the Angular tutorial. If you're primarily using React or Web Components, you should be using the nx commands. The difference is that there is only a workspace.json when primarily only using React or Web Components. The nx command delegates appropriately, but we could define this more clearly in the docs for the Nx CLI here: https://nx.dev/react/guides/cli
+```
+
+Well, we want to use both.  So how to make Storybook know that?
+
+```bash
+nx generate storybook-configuration layout
+...
+Schematic "storybook-configuration" not found
+```
+
+Tried this from [here: "Error when using storybook-configuration schematic"](https://github.com/nrwl/nx/issues/2082)
+
+```bash
+>nx g @nrwl/angular:storybook-configuration
+? Configure a cypress e2e app to run against the storybook instance? Yes
+? Automatically generate *.stories.ts files for components declared in this library? Yes
+? Automatically generate *.spec.ts files in the cypress e2e app generated by the cypress-configure schematic? Yes
+Schematic input does not validate against the Schema: {"configureCypress":true,"generateStories":true,"generateCypressSpecs":true}
+Errors:
+  Data path "" should have required property 'name'.
+```
+
+Stashed that branch and started again.  I also commented on [this issue: Angular storybook library fails to compile if using workspace.json #3043](https://github.com/nrwl/nx/issues/3043)
+
+isaacplmann commented yesterday:
+*@timofeysie It looks like the PR was tagged with the 6.0 milestone. So whenever they release 6.0, we'll update the dependencies for @nrwl/storybook and everything should work.  In the meantime, you could work around this issue by renaming workspace.json to angular.json. You could even change the name back after running the storybook schematics.*
+
+Trying out that idea and changing the name of workspace.json to angular.json didn't work.  Then it complained that there is no workspace.json.
+
+```bash
+>nx run layout:storybook
+fs.js:125
+    throw err;
+    ^
+Error: ENOENT: no such file or directory, open 'C:\Users\timof\repos\timofeysie\clades/workspace.json'
+```
+
+Stashing all that and trying to generate the layout storybook again also fails:
+
+```bash
+C:\Users\timof\repos\timofeysie\clades>nx g @nrwl/angular:storybook-configuration layout
+internal/modules/cjs/loader.js:613
+    throw err;
+    ^
+Error: Cannot find module 'C:\Users\timof\repos\timofeysie\clades\node_modules\@angular\cli\lib\init.js'
+Require stack:
+- C:\Users\timof\repos\timofeysie\clades\node_modules\@nrwl\cli\lib\init-local.js
+...
+```
+
+isaacplmann also said: *It looks like here's an issue that gives estimates of when 6.0 will be released. I'd follow that issue for updates.*
+
+That issue has a road map date for a release a week ago:
+
+🏁 6.0.0 2020-05-19
+
+I also don't know what problems I will run into using the latest storybook with nx which already doesn't work.
 
 ## Testing a dispatch action
 
@@ -3143,7 +3267,7 @@ npx: installed 199 in 23.278s
 ? What to create in the new workspace web components    [a workspace with a single app
 built using web components]
 ? Application name                    clades
-? Default stylesheet format           CSS
+? Default stylesheet format      0    CSS
 ...
 > nx generate @nrwl/react:app
 ? What name would you like to use for the application? monophyletic
