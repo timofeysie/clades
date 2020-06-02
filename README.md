@@ -13,7 +13,7 @@ It also has the Stratum app with unit tests for the counter example to create a 
 - [Storybook integration with Nrwl](#storybook-integration-with-Nrwl)
 - [Testing a dispatch action](#testing-a-dispatch-action)
 - [The @nxtend/ionic-react plugin](#the-@nxtend/ionic-react-plugin)
-- [Re-implementing the Duncan](#re-implementing-the-Duncan)
+- [Updating the Workshop](#updating-the-Workshop)
 - [Testing Ngrx](#testing-ngrx)
 - [Implementing the counter example from the official docs](#implementing-the-counter-example-from-the-official-docs)
 - [NgRx counter example](#ngRx-counter-example)
@@ -262,7 +262,7 @@ Nrwl out of the box creates a separate app for end-to-end tests which also has a
 
 It has a great dashboard and tools available for working with the end to end an integration tests, but the tests shown on the Ngrx testing page are a different kind of integration testing, so we wont be working in the stratum-e2e directory yet.
 
-The directory structure in the docs show that they are in a tests directory. The recommendation for Angular is to colocate them with their components. Not wanting to create a file called counter.integration.spect.ts, I just created a directory in the app for a file like this: /app/tests/integration.spec.ts.
+The directory structure in the docs show that they are in a tests directory. The recommendation for Angular is to colocate them with their components. Not wanting to create a file called counter.integration.spec.ts, I just created a directory in the app for a file like this: /app/tests/integration.spec.ts.
 
 That's all nice but it doesn't say it's for the counter. I'm still undecided as to if these are actually e2e integration tests that can be interpreted into their Cypress equivalent, or they are actually just unit tests that can live in the same directory as the component under tests. I think there is an acronym for that.
 
@@ -437,12 +437,13 @@ But first run we get this:
 Collection "@nrwl/angular" cannot be resolved.
 ```
 
-If we install this with npm, it shoudl fix the problem:
+If we install this with npm, it should fix the problem:
 
 ```bash
 npm install @nrwl/angular
 ```
 
+This step could be added to the "0 - Environment Setup" section [Install Angular CLI and Nx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/introduction/0-environment-setup), or it could come just before generating the app.
 
 ### Step 1: creating the Angular app
 
