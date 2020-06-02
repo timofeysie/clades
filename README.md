@@ -347,11 +347,102 @@ nx serve luca
 
 This is a demo project to try out the [Ionic/React plugin](https://github.com/devinshoemaker/nxtend) featured in a [recent blog by the NrWl team](https://blog.nrwl.io/computation-caching-out-of-the-box-revamped-docs-community-plugins-and-more-in-nx-9-2-e97801116e02). No plans yet to develop anything with it.
 
-## Re-implementing the Duncan
+## Updating the Workshop
 
 As the code from the GitBook: [Workshop: Enterprise Angular applications with NgRx and Nx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/) is over two years old now, this is a tentative step by step implementation of the same code but using a currently generated nx workspace based on Nrwl 9.
 
 Note the section numbers and the step numbers used here are not the same.
+
+The project for the GitHub book lives [here](https://github.com/duncanhunter/Enterprise-Angular-Applications-With-NgRx-and-Nx-Book).  Duncan has agreed to open source the content, and has agreed to let me make merge requests to update the workshop commands and code.
+
+The introduction to Angular and environment setup doesn't need any serious changes, so the first change would be in the creation of the demo app in [the workspace creation section](https://github.com/duncanhunter/Enterprise-Angular-Applications-With-NgRx-and-Nx-Book/blob/master/2-creating-an-nx-workspace.md), which brings us to our first problem.
+
+### Generating the workspace
+
+This workspace (Clades) was first created while following along with the [official video tutorial](https://www.youtube.com/watch?v=Y9ZgpvcFUXs&list=PLakNactNC1dH38AfqmwabvOszDmKriGco&index=4).
+
+```bash
+>npx create-nx-workspace@latest clades
+npx: installed 199 in 23.278s
+? What to create in the new workspace web components    [a workspace with a single app
+built using web components]
+? Application name                    clades
+? Default stylesheet format      0    CSS
+```
+
+The [official docs for the CLI overview](https://nx.dev/angular/cli/overview) shows this command:
+
+```bash
+npx create-nx-workspace@latest
+npx: installed 198 in 37.986s
+? Workspace name (e.g., org name)     demo-app
+? What to create in the new workspace empty             [an empty workspace]
+? CLI to power the Nx workspace       Nx           [Extensible CLI for JavaScript and TypeScript applications]
+Creating a sandbox with Nx...
+[##################################################################################################################################################] 364/364 new demo-app --preset="empty" --interactive=false --collection=@nrwl/workspace
+    Successfully initialized git.
+CREATE demo-app/nx.json (463 bytes)
+CREATE demo-app/tsconfig.json (509 bytes)
+CREATE demo-app/package.json (1100 bytes)
+CREATE demo-app/README.md (2538 bytes)
+CREATE demo-app/.editorconfig (245 bytes)
+CREATE demo-app/.gitignore (503 bytes)
+CREATE demo-app/.prettierignore (74 bytes)
+CREATE demo-app/.prettierrc (26 bytes)
+CREATE demo-app/workspace.json (1130 bytes)
+CREATE demo-app/apps/.gitkeep (1 bytes)
+CREATE demo-app/libs/.gitkeep (0 bytes)
+CREATE demo-app/tools/tsconfig.tools.json (218 bytes)
+CREATE demo-app/tools/schematics/.gitkeep (0 bytes)
+CREATE demo-app/.vscode/extensions.json (109 bytes)
+```
+
+There are two main choices when generating a new workspace:
+
+```bash
+√ Packages installed successfully.
+> Nx           [Extensible CLI for JavaScript and TypeScript applications]
+  Angular CLI  [Extensible CLI for Angular applications. Recommended for Angular projects.]  
+```
+
+Since the official tutorial shows using nx, and I would also like to be able to create React and other kinds of apps in the same monorepo, I went with nx.  The problem is, all the commands in the workshop are shown on the presumption that you choose the Angular CLI.
+
+For example, the command to generate the workspace in the workshop is:
+
+```bash
+ng new demo-app --collection=@nrwl/schematics
+```
+
+### Generating a new project
+
+The same issue of nx/ng will come up when creating the first demo app.
+
+To generate a new project, the workshop code shows:
+
+```bash
+ng g application customer-portal --style=scss --routing --prefix=app
+```
+
+This would be changed to:
+
+```bash
+nx generate @nrwl/angular:app demo-app --style=scss --routing --prefix=app
+```
+
+This will create a workshop.json file, which is equivalent to the angular.json file, but more open with the kind of projects it works with.  Since I am interested in React as well as Angular projects in my monorepo, I would use the nx CLI where a pure Angular based monorepo would use the ng CLI directly.
+
+But first run we get this:
+
+```bash
+Collection "@nrwl/angular" cannot be resolved.
+```
+
+If we install this with npm, it shoudl fix the problem:
+
+```bash
+npm install @nrwl/angular
+```
+
 
 ### Step 1: creating the Angular app
 
