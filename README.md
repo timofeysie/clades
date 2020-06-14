@@ -48,7 +48,7 @@ ng affected:e2e # run e2e tests for current changes
 
 ## Storybook integration with Nrwl
 
-The Nrwl blog featured an article recently on [writing UI tests with Storybook and Cypress](https://blog.nrwl.io/ui-testing-with-storybook-and-nx-4b86975224c).  This integration was introduces in version 8.8 of Nx.  UI tests offer a third type of test to the usual unit and end-to-end tests that come standard with Angular and Nrwl workspaces.  They are similar to end-to-end tests but focus on a single route or component.
+The Nrwl blog featured an article recently on [writing UI tests with Storybook and Cypress](https://blog.nrwl.io/ui-testing-with-storybook-and-nx-4b86975224c).  This integration was introduced in version 8.8 of Nx.  UI tests offer a third type of test to the usual unit and end-to-end tests that come standard with Angular and Nrwl workspaces.  They are similar to end-to-end tests but focus on a single route or component.
 
 The author of the blog article Isaac Mann says *UI tests have high fidelity and high precision*.  The @nrwl/storybook plugin also increases the speed of UI tests to an acceptable level.
 
@@ -345,7 +345,56 @@ nx generate @nxtend/ionic-react:application luca
 nx serve luca
 ```
 
-This is a demo project to try out the [Ionic/React plugin](https://github.com/devinshoemaker/nxtend) featured in a [recent blog by the NrWl team](https://blog.nrwl.io/computation-caching-out-of-the-box-revamped-docs-community-plugins-and-more-in-nx-9-2-e97801116e02). No plans yet to develop anything with it.
+This is a demo project to try out the [Ionic/React plugin](https://github.com/devinshoemaker/nxtend) featured in a [recent blog by the NrWl team](https://blog.nrwl.io/computation-caching-out-of-the-box-revamped-docs-community-plugins-and-more-in-nx-9-2-e97801116e02).
+
+### Trying out Cmi5
+
+What is cmi5?  I've used the xAPI before for e-learning project, and lurk around the spec project.  One issue that came up ended up having a comment about cmi5 which appears to be a stripped down/focused use case of the xAPI.
+
+These are some notes about what it is an how it's used.
+
+You can read more on the AICC [Cmi5 project](https://github.com/AICC/CMI-5_Spec_Current/blob/quartz/cmi5_spec.md#overview).  What is AICC?  The title of their profile says only *The cmi5 Project xAPI Profile for LMS systems*
+
+The [Summary of cmi5 in Action](https://xapi.com/cmi5-technical-101/?utm_source=google&utm_medium=natural_search) provides a good checklist for what we would want a client to implement:
+
+1. Create Course structure
+2. Add AUs and Blocks to Course
+3. Import Course into LMS
+4. Registration is created in LMS at Course level for a specific Learner
+5. AUs are launched in a Session for a Registration which may occur in a new window or existing one, a “Launched” Statement is recorded
+6. AU starts execution by retrieving LRS authentication credentials and various other launch data (including the launch mode), an “Initialized” Statement is recorded
+7. AU manages content interaction, depending on mode and Learner actions it may record “Passed” or “Failed”, and/or “Completed” Statements
+8. If the above Statements satisfy the “Move On” criteria then the LMS records a “Satisfied” Statement for any Block or Course that has been satisfied
+9. AU may record “cmi5 allowed” Statements, must occur between “Initialized” and “Terminated” Statements but otherwise can be intermixed with other “cmi5 defined” Statements
+10. AU ends execution, a “Terminated” Statement is recorded indicating the end of the Session
+11. AU loads return URL as provided in launch data by LMS
+12. LMS may determine that a Session has been concluded without a “Terminated” statement having been recorded, at which point it records an “Abandoned” Statement
+Multiple sessions in various launch modes may occur for the same Registration
+
+Sone definitions
+
+- Learning Management Systems (LMS)
+- Assignable Units (AU)
+
+The launchable piece of content that includes the concepts of completion, pass/fail, score, and duration. Each course requires at least one AU. AU metadata is captured in the Course structure file, but content assets may be included in a package or hosted remotely.
+
+### react-cmi5
+
+Came across [this project](https://github.com/beatthat/react-cmi5/blob/master/README.md) and want to see what it's all about.  Not sure if it's going to work.  The readme says:
+
+*npm install react-cmi5 will have copied cmi5.js to the public folder at the root of your React project.  You must include cmi5.js in your index.html. The reason this is included as a downloadable script instead of a normal node package dependency is because that is how the cmi5.js lib is currently distributed (already bundled code). In a future release it would be good to tease apart the cmi5.js contents into npm packages and remove the need for the script-tag include.*
+
+Working in a monorepo may not be the right place to try this out.
+
+```bash
+npm install --save react-cmi5
+```
+
+### Luca workflow cheat-sheet
+
+```bash
+nx serve luca # React Ionic test app
+```
 
 ## Updating the Workshop
 
@@ -370,10 +419,10 @@ built using web components]
 ? Default stylesheet format      0    CSS
 ```
 
-The [official docs for the CLI overview](https://nx.dev/angular/cli/overview) shows this command:
+The [official docs for the CLI overview](https://nx.dev/angular/cli/overview) shows this command which if fully interactive:
 
 ```bash
-npx create-nx-workspace@latest
+>npx create-nx-workspace@latest
 npx: installed 198 in 37.986s
 ? Workspace name (e.g., org name)     demo-app
 ? What to create in the new workspace empty             [an empty workspace]
@@ -407,6 +456,8 @@ There are two main choices when generating a new workspace:
 
 Since the official tutorial shows using nx, and I would also like to be able to create React and other kinds of apps in the same monorepo, I went with nx.  The problem is, all the commands in the workshop are shown on the presumption that you choose the Angular CLI.
 
+(*Not sure about the below command.  Leaving this note here for now*)
+
 For example, the command to generate the workspace in the workshop is:
 
 ```bash
@@ -423,11 +474,107 @@ To generate a new project, the workshop code shows:
 ng g application customer-portal --style=scss --routing --prefix=app
 ```
 
-This would be changed to:
+#### The ng version
+
+Exploring the idea of showing both nx and ng versions of all commands in the same way that many articles show both npm and yarn usage.  It's a bit more work but if avoiding ng is a serious breaking change for previous workspaces, it might be good to just do it everywhere, so that people can jump around between sections.
+
+With this in mind, I have created a workspace with the following command:
 
 ```bash
-nx generate @nrwl/angular:app demo-app --style=scss --routing --prefix=app
+>npx create-nx-workspace@latest ng-demo-app
+npx: installed 198 in 58.771s
+? What to create in the new workspace empty             [an empty workspace]
+? CLI to power the Nx workspace       Angular CLI  [Extensible CLI for Angular applications. Recommended for Angular projects.]
+Creating a sandbox with Nx...
 ```
+
+Then create the first app:
+
+```bash
+>cd ng-demo-app
+>ng g application customer-portal --style=scss --routing --prefix=app
+? Would you like to share anonymous usage data about this project with the Angular Team at
+Google under Google’s Privacy Policy at https://policies.google.com/privacy? For more
+details and how to change this setting, see http://angular.io/analytics. No
+An unhandled exception occurred: Schematic "application" not found in collection "@nrwl/workspace".
+See "C:\Users\timof\AppData\Local\Temp\ng-08jrwz\angular-errors.log" for further details.
+```
+
+So maybe the Nrwl 9 version of this command looks like this:
+
+```bash
+ng g @nrwl/angular:app customer-portal --style=scss --routing --prefix=app
+```
+
+```bash
+>ng g @nrwl/angular:app customer-portal --style=scss --routing --prefix=app
+An unhandled exception occurred: Cannot find module '@nrwl\angular\package.json'
+Require stack:
+ C:\Users\timof\repos\timofeysie\ng-demo-app\node_modules\@angular-devkit\schematics\tools\node-module-engine-host.js
+ ...
+```
+
+Maybe we need this: ```npm i @nrwl/angular```.  Yes, that lets the above command complete.
+
+Do we need a --save-dev for this to avoid this problem when people clone a pre-created workspace?
+
+### Questions for Duncan
+
+Since Duncan has agreed to let me help update the GitBook workshop sections, here is a place to collect questions regarding how to proceed.
+
+- Should be cover both nx and ng commands?
+- Show output of commands?
+- Show > before commands?
+- Use --save-dev on commands to add schematics?
+- Is "issue with setting scss as default for lib" still an issue?
+- How to show code examples
+- Should we convert the day 1/2 style workshop to a more web based course format
+
+#### Should we convert the day 1/2 style workshop to a more web based course format
+
+In the introduction to the workshop, the content is specifically targeted to a two day event with instructors.  It would be easy to convert the content to a more generally approachable course.
+
+The sentence: "You need to bring your own laptop with the below software installed"
+
+Could become: "You must have the below software installed in your developer environment"
+
+There is also the possibility of adding optional tangents such as unit testing and other integrations, such as filling out an actual auth solution.
+
+#### How to show code examples
+
+In the workshop, code examples are shown like this:
+
+{% code title="libs/auth/src/auth.module.ts" %}
+```typescript
+import { NgModule } from '@angular/core';
+...
+```
+{% endcode %}
+
+My markdown lint plugin wants those spaces there, but not sure what that will do to whatever is going to parse these code examples.
+
+I usually show code examples in markdown like this:
+
+#### **`libs/auth/src/auth.module.ts`**
+
+```js
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+...
+```
+
+So, I'm not sure what I should be doing about this.  I notice that the Gitbook has already been updated, and in that case, those code examples should work, unless the extra spaces the the markdownlint plugin wants effect that.  Please let me know what you want to do about those.
+
+The good news is that when the original code examples are deployed to [the Gitbook](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/introduction/3-generating-components-and-nx-lib). the extra spaces don't hurt the formatting.
+
+#### The Nx version
+
+Back to nx, the app creation command from the workshop can be changed to this:
+
+```bash
+nx generate @nrwl/angular:app customer-portal --style=scss --routing --prefix=app
+```
+
+Now it's a good time to get some coffee.  This could take a while.
 
 This will create a workshop.json file, which is equivalent to the angular.json file, but more open with the kind of projects it works with.  Since I am interested in React as well as Angular projects in my monorepo, I would use the nx CLI where a pure Angular based monorepo would use the ng CLI directly.
 
@@ -444,6 +591,137 @@ npm install @nrwl/angular
 ```
 
 This step could be added to the "0 - Environment Setup" section [Install Angular CLI and Nx](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/introduction/0-environment-setup), or it could come just before generating the app.
+
+### Creating a demo workspace
+
+While working on a demo app which follows the steps in the workshop, during section three, there were some problems with the imports in the app.module.ts:
+
+```js
+import { NxModule } from '@nrwl/nx';
+```
+
+The TS error was:
+
+```txt
+Cannot find module '@nrwl/nx'.ts(2307)
+```
+
+The solution for that is running this command:
+
+```bash
+npm i @nrwl/nx --save
+```
+
+Usually if you get a message like:
+
+```bash
+Cannot find module 'x'
+```
+
+The solution is usually:
+
+```bash
+npm install x
+```
+
+These were some of the other missing dependencies when updating the app.module.ts file in section 3.
+
+```bash
+npm i --save @angular/platform-browser
+npm i --save @angular/core
+npm i @nrwl/nx
+npm i @angular/router
+```
+
+Finally was able to get rid of the errors, but when serving the app:
+
+```bash
+nx serve customer-portal
+```
+
+This was the output:
+
+```bash
+>nx serve customer-portal
+> nx run customer-portal:serve
+Cannot find module '@angular-devkit/build-angular/package.json'
+Require stack:
+- C:\Users\timof\repos\timofeysie\demo-app\node_modules\@angular-devkit\architect\node\node-modules-architect-host.js
+```
+
+```bash
+npm install --save-dev @angular-devkit/build-angular
+```
+
+Then there were these errors also:
+
+```bash
+Cannot find module '@angular/compiler-cli'
+Cannot find module '@angular/compiler'
+```
+
+This was too much, so just went ahead and did a whole ```npm i```.
+
+Then the serve worked, but got the following error, and a broken app saying *cannot GET /*.
+
+The console said:
+
+```bash
+ERROR in The target entry-point "@nrwl/nx" has missing dependencies:
+ - @ngrx/effects
+ - @ngrx/router-store
+ - @ngrx/store
+** Angular Live Development Server is listening on localhost:4200, open your browser on http://localhost:4200/ **
+```
+
+Strange, as there is no ngrx yet in the app.  Deleted node_modules, ran npm install again and then, the app.module.ts file was back to being all errors again.`
+
+There is no info on this error, so it might be worth starting a new app at this point to see if this comes up again.
+
+Created a new app, went through the steps and again:
+
+```txt
+npx create-nx-workspace@latest
+cd demo-app
+npm install @nrwl/angular
+nx g application --help
+nx generate @nrwl/angular:app customer-portal --routing
+nx serve customer-portal
+git add .
+git commit -m "generated customer-portal Angular app"
+nx generate @nrwl/angular:lib auth --routing
+nx generate @nrwl/angular:component containers/login --project=auth
+nx generate @nrwl/angular:component components/login-form --project=auth
+```
+
+Update the auth.module.ts, app.component.html and app.module.ts files as shown.
+
+At the end of *3 - Generating components and Nx lib part 4. Update the consuming Customer Portal App module* when serving the app got to the same error again:
+
+```txt
+Cannot find module '@nrwl/nx'.ts(2307)
+```
+
+Ran the same solution again:
+
+```bash
+npm i @nrwl/nx --save
+```
+
+But when serving the app again, got the beginning of the same cycle again:
+
+```bash
+> nx run customer-portal:serve
+Cannot find module '@angular-devkit/build-angular/package.json'
+Require stack:
+```
+
+There are three imports with red squiggly TypeScript errors under them, but also an red squiggly VSCode error under the first i of the first import that the mouseover hint says:
+
+```txt
+Cannot read tslint configuration - 'Failed to load c:\Users\timof\repos\timofeysie\nrwl\demo-app\apps\customer-portal\tslint.json: Could not find custom rule directory: node_modules/codelyzer'
+tslint(1)
+```
 
 ### Step 1: creating the Angular app
 
@@ -478,6 +756,38 @@ Commit: [Workshop Step 1: creating the Angular app](https://github.com/timofeysi
 [Original Workshop line](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/2-creating-an-nx-workspace)
 
 ### Step 2: Generate the auth lib
+
+The original workshop starts off with this command:
+
+```bash
+>ng g lib --help
+An unhandled exception occurred: Unable to locate a workspace file for workspace path.
+See "C:\Users\timof\AppData\Local\Temp\ng-kDgbo8\angular-errors.log" for further details.
+```
+
+The updated version works like this:
+
+```bash
+>nx g lib --help
+nx generate @nrwl/angular:library [name] [options,...]
+Options:
+  --name                  Library name
+  --directory             A directory where the lib is placed
+  --publishable           Generate a buildable library.
+  --prefix                The prefix to apply to generated selectors.
+  --skipFormat            Skip formatting files
+  --simpleModuleName      Keep the module name simple (when using --directory)
+  --skipPackageJson       Do not add dependencies to package.json.
+  --skipTsConfig          Do not update tsconfig.json for development experience.
+  --style                 The file extension to be used for style files. (default: css)
+  --routing               Add router configuration. See lazy for more information.
+  --lazy                  Add RouterModule.forChild when set to true, and a simple array of routes when set to false.
+  --parentModule          Update the router configuration of the parent module using loadChildren or children, depending on what `lazy` is set to.
+  --tags                  Add tags to the library (used for linting)
+  --unitTestRunner        Test runner to use for unit tests (default: jest)
+  --dryRun                Runs through and reports activity without writing to disk.
+  --help                  Show available options for project target.
+```
 
 This command generates an Angular lib project:
 
@@ -550,7 +860,7 @@ But when it comes time for the next step "Add a default route", there is no `lib
 
 [Source](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/3-generating-components-and-nx-lib)
 
-It seems like they skipped the Angular module part. There these files, but the first one exports the empty second one.
+It seems like they skipped the Angular module part. There are these files, but the first one exports the empty second one.
 
 ```bash
 libs\auth\src\index.ts
