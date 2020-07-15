@@ -388,7 +388,14 @@ Working in a monorepo may not be the right place to try this out.
 
 ```bash
 npm install --save react-cmi5
+npm ERR! code ELIFECYCLE
+npm ERR! errno 1
+npm ERR! cypress@4.3.0 postinstall: `node index.js --exec install`
 ```
+
+the [dynamic-forms project](https://github.com/timofeysie/dynamic-forms) then might be the next place to try this out.  It hasn't had any love for a long time.
+
+And yes, it did complete there.
 
 ### Luca workflow cheat-sheet
 
