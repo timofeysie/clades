@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Effect, Actions, ofType } from '@ngrx/effects';
 import { fetch } from '@nrwl/angular';
 import { mergeMap, map, catchError, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+// import { of } from 'rxjs';
 import { AuthActionTypes } from './auth.actions';
 import * as fromAuth from './auth.reducer';
 import * as AuthActions from './auth.actions';
@@ -18,8 +18,7 @@ export class AuthEffects {
     ofType(AuthActionTypes.Login),
     fetch({
       run: action => {
-        this.authService
-        .login(action)
+        this.authService.login(action);
       },
       onError: (action, error) => {
         console.error('Error', error);
@@ -29,9 +28,9 @@ export class AuthEffects {
   );
 
   @Effect({ dispatch: false })
-  navigateToProfile $ = this.actions$.pipe(
+  navigateToProfile$ = this.actions$.pipe(
     ofType(AuthActionTypes.LoginSuccess),
-    map((action: loginSuccess) => action.payload),
+    map((action: AuthActionTypes.LoginSuccess) => action),
     tap(() => this.router.navigate([`/products`]))
   );
 
