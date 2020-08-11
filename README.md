@@ -46,6 +46,22 @@ ng affected:test # run tests for current changes
 ng affected:e2e # run e2e tests for current changes
 ```
 
+To run the Enterprise Angular App with NgRx example, start the JSON server like this:
+
+```bash
+npm run server
+... or
+yarn run server
+```
+
+It will be live on http://localhost:3000
+
+Then serve the app:
+
+```bash
+nx serve stromatolites
+```
+
 ## Storybook integration with Nrwl
 
 The Nrwl blog featured an article recently on [writing UI tests with Storybook and Cypress](https://blog.nrwl.io/ui-testing-with-storybook-and-nx-4b86975224c).  This integration was introduced in version 8.8 of Nx.  UI tests offer a third type of test to the usual unit and end-to-end tests that come standard with Angular and Nrwl workspaces.  They are similar to end-to-end tests but focus on a single route or component.
@@ -93,7 +109,7 @@ nx run project-name:storybook
 
 Running this on the ui-header lib looks like this:
 
-```s
+```bash
 >nx g @nrwl/angular:storybook-configuration ui-header
 ? Configure a cypress e2e app to run against the storybook instance? Yes
 ? Automatically generate *.stories.ts files for components declared in this library? Ye

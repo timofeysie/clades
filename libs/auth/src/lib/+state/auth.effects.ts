@@ -5,11 +5,8 @@ import { fetch } from '@nrwl/angular';
 import { mergeMap, map, catchError, tap } from 'rxjs/operators';
 // import { of } from 'rxjs';
 import { AuthActionTypes } from './auth.actions';
-import * as fromAuth from './auth.reducer';
 import * as AuthActions from './auth.actions';
-import { User } from '@clades/data-models';
 import { AuthService } from './../services/auth/auth.service';
-import { login, loginSuccess, loginFailure } from './auth.actions';
 
 @Injectable()
 export class AuthEffects {
