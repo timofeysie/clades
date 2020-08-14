@@ -2725,6 +2725,110 @@ The second one will need more work.  The workshop code shows:
 ```
 
 
+### update the
+
+Replace the old actions:
+```js
+this.store.dispatch(login({ payload: authenticate }));
+```
+
+This dispatch statement from the original:
+```js
+this.store.dispatch(new authActions.Login(authenticate));
+```
+
+Becomes this:
+
+```js
+this.store.dispatch(login({ payload: authenticate }));
+```
+
+Next, part 4: add new effect to manage routing
+
+The old link is a 404:
+https://github.com/ngrx/platform/blob/master/docs/router-store/api.md#navigation-actions
+
+I guess it is now one of these:
+
+```txt
+https://ngrx.io/api/router-store/RouterNavigationAction
+https://ngrx.io/api/router-store
+https://ngrx.io/guide/router-store/actions
+```
+
+I'm guessing it's the last one.
+
+The previous effect:
+
+```js
+@Effect()
+login$ = this.actions$.pipe(
+  ofType(AuthActionTypes.Login),
+  mergeMap((action: authActions.Login) =>
+    this.authService
+      .login(action.payload)
+      .pipe(
+        map((user: User) => new authActions.LoginSuccess(user)),
+        catchError(error => of(new authActions.LoginFail(error)))
+      )
+  )
+);
+```
+
+The new one looks like this:
+
+```js
+@Effect()
+login$ = this.actions$.pipe(
+  ofType(AuthActionTypes.Login),
+  fetch({
+    run: action => {
+      this.authService.login(action);
+    },
+    onError: (action, error) => {
+      return AuthActions.loginFailure(error);
+    }
+  })
+);
+```
+
+A brief of the two very different effects:
+
+```js
+ofType(AuthActionTypes.Login),
+mergeMap((action: authActions.Login) => this.authService.login(action.payload)
+    .pipe(
+      map((user: User) => new authActions.LoginSuccess(user)),
+      catchError(error => of(new authActions.LoginFail(error)))))
+
+ofType(AuthActionTypes.Login),
+fetch({ run: action => { this.authService.login(action); },
+  onError: (action, error) => { return AuthActions.loginFailure(error); }
+```
+
+Next, export the effects.  The article shows this:
+
+```js
+export * from './lib/auth.module';
+export { AuthService } from './lib/services/auth/auth.service';
+export { AuthGuard } from './lib/guards/auth/auth.guard';
+export { AuthState } from './lib/+state/auth.reducer';
+```
+
+The clades version is this:
+
+```js
+export * from './lib/+state/auth.actions';
+export * from './lib/+state/auth.reducer';
+export * from './lib/+state/auth.selectors';
+export * from './lib/+state/auth.models';
+export * from './lib/auth.module';
+export { AuthService } from './lib/services/auth/auth.service';
+export { AuthGuard } from './lib/guards/auth/auth.guard';
+```  
+
+
+
 
 #### Workflow shortcuts for Stromatolites
 
