@@ -2728,11 +2728,13 @@ The second one will need more work.  The workshop code shows:
 ### update the
 
 Replace the old actions:
+
 ```js
 this.store.dispatch(login({ payload: authenticate }));
 ```
 
 This dispatch statement from the original:
+
 ```js
 this.store.dispatch(new authActions.Login(authenticate));
 ```
@@ -2825,7 +2827,8 @@ export * from './lib/+state/auth.models';
 export * from './lib/auth.module';
 export { AuthService } from './lib/services/auth/auth.service';
 export { AuthGuard } from './lib/guards/auth/auth.guard';
-```  
+export { AuthState } from './lib/+state/auth.reducer'; <-- added
+```
 
 
 
@@ -3637,7 +3640,7 @@ Why would we need this? The name is a bit deceiving. If you look at the products
 </div>
 ```
 
-The real reson you need entity is that the above causes this classic error:
+The real reason you need entity is that the above causes this classic error:
 
 ```bash
 Cannot find a differ supporting object '[object Object]' of type 'object'. NgFor only supports binding to Iterables such as Arrays.

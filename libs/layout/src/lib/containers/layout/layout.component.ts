@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '@clades/auth'
 import { Observable } from 'rxjs';
 import { User } from '@clades/data-models';
+import { Store } from '@ngrx/store';
+import * as AuthActions from '@clades/auth';
 
 @Component({
   selector: 'clades-layout',
@@ -21,8 +23,10 @@ export class LayoutComponent implements OnInit {
   logout() {
     this.authService.logout();
     this.user$ = this.authService.user$;
-    // this.store.dispatch(new authActions.AuthService.Login({}));
+    // TODO:  Was part of 9 extra credit originally
+    // this.store.dispatch(AuthActions.logout();
     // this.user$ = this.store.select(getUser);
+    // will update this as part of 14 - selectors.
   }
   
 }

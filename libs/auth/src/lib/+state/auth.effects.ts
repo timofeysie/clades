@@ -14,10 +14,9 @@ export class AuthEffects {
     ofType(AuthActionTypes.Login),
     fetch({
       run: action => {
-        this.authService.login(action);
+        return AuthActions.loginSuccess(action);
       },
       onError: (action, error) => {
-        console.error('Error', error);
         return AuthActions.loginFailure(error);
       }
     })
@@ -26,8 +25,12 @@ export class AuthEffects {
   @Effect({ dispatch: false })
   navigateToProfile$ = this.actions$.pipe(
     ofType(AuthActionTypes.LoginSuccess),
-    map((action: AuthActionTypes.LoginSuccess) => action),
-    tap(() => this.router.navigate([`/products`]))
+    map((action: AuthActionTypes.LoginSuccess) => {
+      return action;
+    }),
+    tap(() => {
+      this.router.navigate([`/products`])
+    })
   );
 
   constructor(

@@ -18,7 +18,6 @@ export class LoginComponent implements OnInit {
   ngOnInit() {}
 
   login(authenticate: Authenticate): void {
-    this.authService.login(authenticate).subscribe();
     this.store.dispatch(login({ payload: authenticate }));
   }
 }
