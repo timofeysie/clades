@@ -2724,8 +2724,7 @@ The second one will need more work.  The workshop code shows:
   );
 ```
 
-
-### update the
+### update the actions
 
 Replace the old actions:
 
@@ -3504,7 +3503,7 @@ That says:
 }
 ```
 
-So that's true. Login succeeds, and the loader turns false.
+So that's true. Login succeeds, and the loader returns false.
 
 But, the undefined is not helpful, and it seems that the Login action should not be about loading. Shouldn't it say something like "authenticated: false => true"?
 
@@ -3515,6 +3514,8 @@ ERROR in libs/auth/src/lib/auth.module.ts(12,3): error TS2305: Module '"C:/Users
 ```
 
 That was some old code in the auth module. After that, a new Effect action was added to navigate on LoginSuccess, update AuthGuard to use the store and in the customer portal component on-load, check local storage and dispatch a LoginSuccess action and we navigate to the products page, which is still not implemented.
+
+### Step 14 & 15: Selectors & the Products Feature Module
 
 Next, selectors. [The first step](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/14-ngrx-selectors) is to create in index file for the store. Wait, didn't we have a selector file and delete it? Why not call it auth.selector.ts, and not index.ts, which is like a barrel file?
 
@@ -3527,15 +3528,39 @@ import * as fromProduct from './products.reducer';
 
 There is actually an auth reducer in the source file. Maybe Duncan made a mistake with the source files he posted? The next step is to add the products feature module, so instead of trying to figure out what was intended in this short step with almost no explanations, it might be just better to move on to step 15 for now.
 
+```getProducts``` is the name of the selector created.  However, it then shows using a selector named ```productsQuery``` like this:
+
+```js
+import { productsQuery } from '@demo-app/auth';
+...
+this.user$ = this.store.select(productsQuery.getUser);
+```
+
+Putting a product selector in the auth module seems like a wrong move.  From past experience I know that there are more inconsistencies in the later code with naming changes and what not.  Duncan hasn't merge the changes from the last few sections so I can't rely on him to answer any questions.
+
 Moving on, there is a typo on the next step brief: _In this section we challenge you understanding by adding a Products module like we did for login_. "You" should be "your".
 
-Going along with it,
+Going along with it for now.  Will decided about products.selectors.ts
+ while going through the next section.  It starts off with this command which last time around asked these questions:
 
 ```bash
 ng generate ngrx products --module=libs/products/src/lib/products.module.ts
 ? Is this the root state of the application? No
 ? Would you like to add a Facade to your ngrx state No
 ```
+
+Shouldn't we use nx now?  It will use the Angular CLI under the hood, with some extra caching thrown in.
+
+nx generate ngrx
+
+> ng g ngrx app --module=apps/customer-portal/src/app/app.module.ts  --onlyEmptyRoot
+> ng generate ngrx auth --module=libs/auth/src/lib/auth.module.ts
+```
+
+nx serve stratum
+
+
+
 
 Not sure if those are the correct answers. It would be nice if the Duncan prepared the reader for this kind of thing, or most likely, these questions were added to the schema after he wrote this tutorial. And the scale of the tutorial made updating it troublesome.
 
