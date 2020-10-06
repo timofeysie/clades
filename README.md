@@ -3517,18 +3517,24 @@ That was some old code in the auth module. After that, a new Effect action was a
 
 ### Step 14 & 15: Selectors & the Products Feature Module
 
-Next, selectors. [The first step](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/14-ngrx-selectors) is to create in index file for the store. Wait, didn't we have a selector file and delete it? Why not call it auth.selector.ts, and not index.ts, which is like a barrel file?
+Next, selectors. [The first step in section 14](https://duncanhunter.gitbook.io/enterprise-angular-applications-with-ngrx-and-nx/14-ngrx-selectors) is to create in index file for the store. Wait, didn't we have a selector file and delete it? Why not call it auth.selector.ts, and not index.ts, which is like a barrel file?
 
-The sample code shows the libs/auth/src/lib/+state/products.selectors.ts file. In this file, it references files that don't exist yet.
+The sample code shows the file:
+
+libs/auth/src/lib/+state/products.selectors.ts
+
+In section 16 we see this selector in the products module:
+
+libs/products/src/lib/+state/products.selectors.ts
+
+In the first file from step 14, it references files that don't exist yet.
 
 ```TypeScript
 import { ProductsState, ProductsData } from './products.reducer';
 import * as fromProduct from './products.reducer';
 ```
 
-There is actually an auth reducer in the source file. Maybe Duncan made a mistake with the source files he posted? The next step is to add the products feature module, so instead of trying to figure out what was intended in this short step with almost no explanations, it might be just better to move on to step 15 for now.
-
-```getProducts``` is the name of the selector created.  However, it then shows using a selector named ```productsQuery``` like this:
+There is actually an auth reducer in the source file. Maybe Duncan made a mistake with the source files he posted? The next step is to add the products feature module?  The selector is used like this in the layout module:
 
 ```js
 import { productsQuery } from '@demo-app/auth';
@@ -3537,6 +3543,56 @@ this.user$ = this.store.select(productsQuery.getUser);
 ```
 
 Putting a product selector in the auth module seems like a wrong move.  From past experience I know that there are more inconsistencies in the later code with naming changes and what not.  Duncan hasn't merge the changes from the last few sections so I can't rely on him to answer any questions.
+
+The files and commands shown in the remaining sections look like this:
+
+```txt
+14 - NgRx Selectors
+
+libs/auth/src/lib/+state/products.selectors.ts
+libs/auth/index.ts
+libs/layout/src/lib/containers/layout/layout.component.ts
+
+15 - Add Products NgRx Feature Module
+
+ng generate ngrx products --module=libs/products/src/lib/products.module.ts
+
+libs/products/src/lib/+state/products.actions.ts
+libs/products/src/lib/+state/products.reducer.ts
+libs/data-models/product.d.ts
+libs/data-models/index.ts
+
+ng g service services/products/products --project=products
+
+libs/products/src/lib/services/products/products.service.ts
+libs/products/src/lib/+state/products.effects.ts
+libs/products/src/lib/+state/products.reducer.ts
+libs/products/src/lib/containers/products/products.component.ts
+libs/products/src/lib/containers/products/products.component.html
+
+16 - Entity State Adapter
+
+npm install @ngrx/entity
+libs/products/src/lib/+state/products.reducer.ts
+libs/admin-portal/users/+state/users.reducer.ts
+libs/products/src/lib/+state/products.selectors.ts
+
+17 - Router Store
+
+ng g c components/product-list --project=products
+
+libs/products/src/lib/components/product-list/product-list.component.ts
+libs/products/src/lib/components/product-list/product-list.component.ts
+libs/products/src/lib/components/product-list/product-list.component.ts
+libs/products/src/lib/containers/products/products.component.html
+lib\containers\products\products.component.ts
+libs\products\src\lib\+state\products.effects.ts
+libs/products/src/lib/services/products/products.service.ts
+```
+
+That helps to see them all together to get it straight what is intended.
+
+### Moving on
 
 Moving on, there is a typo on the next step brief: _In this section we challenge you understanding by adding a Products module like we did for login_. "You" should be "your".
 
@@ -3551,20 +3607,23 @@ ng generate ngrx products --module=libs/products/src/lib/products.module.ts
 
 Shouldn't we use nx now?  It will use the Angular CLI under the hood, with some extra caching thrown in.
 
+```txt
 nx generate ngrx
-
 > ng g ngrx app --module=apps/customer-portal/src/app/app.module.ts  --onlyEmptyRoot
 > ng generate ngrx auth --module=libs/auth/src/lib/auth.module.ts
 ```
 
-nx serve stratum
-
-
-
-
 Not sure if those are the correct answers. It would be nice if the Duncan prepared the reader for this kind of thing, or most likely, these questions were added to the schema after he wrote this tutorial. And the scale of the tutorial made updating it troublesome.
 
-Add Products Action Creators
+The [Quallasuyu monorepo](https://github.com/timofeysie/quallasuyu#adding-NgRx-to-the-customer-portal) where the old code was completed the first time says the following: *Looking at the code for the completed project, there is no auth.selectors.ts file.*
+
+There is an [auth selector](https://github.com/timofeysie/quallasuyu/blob/master/libs/auth/src/lib/%2Bstate/products.selectors.ts) there, as well as [a products selector](https://github.com/timofeysie/quallasuyu/blob/master/libs/products/src/lib/%2Bstate/products.selectors.ts).
+
+The auth selector is completely commented out.  So I think that solves the issue.  The ```productsQuery``` exports four different selectors.
+
+So if the file shown is meant to be the products selector, then really, section 14 should be in section 15 *after* the products lib is created.
+
+Add Products Action Creators:
 
 ```TypeScript
   LoadProducts = '[Products Page] Load Products',
