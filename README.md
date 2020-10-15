@@ -3621,7 +3621,45 @@ There is an [auth selector](https://github.com/timofeysie/quallasuyu/blob/master
 
 The auth selector is completely commented out.  So I think that solves the issue.  The ```productsQuery``` exports four different selectors.
 
+Then how is it used?  Check out [libs/layout/src/lib/containers/layout/layout.component.ts](https://github.com/timofeysie/quallasuyu/blob/master/libs/layout/src/lib/containers/layout/layout.component.ts)
+
+The original section sows this:
+
+```js
+this.user$ = this.store.select(productsQuery.getUser);
+```
+
+But the Quallasuyu project is doing this:
+
+```js
+this.user$ = this.authService.user$;
+```
+
+Whereas the section shows the creation of the getProducts selector.  So then calling it getUser is clearly wrong.
+
 So if the file shown is meant to be the products selector, then really, section 14 should be in section 15 *after* the products lib is created.
+
+Section 14 doesn't really add any extra information about the important subject of selectors.  It only comments on re-exporting the paths in the auth libs index.ts file without anything about selectors.
+
+A potential explanation for them could include
+
+1. Portability, memoization, composition, testability and type safety.
+2. Using the createFeatureSelector with the createSelector function.
+3. The role of the FeatureState in the AppState.
+
+The [official docs on the subject]() also include
+
+Using selectors for multiple pieces of state, Using selectors with props
+Selecting Feature States
+Resetting Memoized Selectors
+Using Store Without Type Generic
+
+The *Advanced Usage* has a subsection titled *Breaking Down the Basics*.  That seems like a good idea just for the introduction, not saving it for an advanced portion.
+
+Extracting a pipeable operator
+Select the last {n} state transitions by combining selectors and RxJS operators in definitely an advanced example I'd like to go through, but the idea here is to get the basics of selectors before moving on to using them in the products page.
+
+### Old notes
 
 Add Products Action Creators:
 
