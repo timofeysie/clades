@@ -5,7 +5,6 @@ import { fetch } from '@nrwl/angular';
 import { map, tap } from 'rxjs/operators';
 import { AuthActionTypes } from './auth.actions';
 import * as AuthActions from './auth.actions';
-import { AuthService } from './../services/auth/auth.service';
 
 @Injectable()
 export class AuthEffects {
@@ -16,7 +15,7 @@ export class AuthEffects {
       run: action => {
         return AuthActions.loginSuccess(action);
       },
-      onError: (action, error) => {
+      onError: (error) => {
         return AuthActions.loginFailure(error);
       }
     })
@@ -35,7 +34,6 @@ export class AuthEffects {
 
   constructor(
     private actions$: Actions,
-    private authService: AuthService,
     private router: Router
   ) {}
 }

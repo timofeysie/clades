@@ -365,7 +365,7 @@ This is a demo project to try out the [Ionic/React plugin](https://github.com/de
 
 ### Trying out Cmi5
 
-What is cmi5?  I've used the xAPI before for e-learning project, and lurk around the spec project.  One issue that came up ended up having a comment about cmi5 which appears to be a stripped down/focused use case of the xAPI.
+What is cmi5?  I've used the xAPI before for e-learning projects.  One issue that came up ended up having a comment about cmi5 which appears to be a stripped down/focused use case of the xAPI.
 
 These are some notes about what it is an how it's used.
 
@@ -3639,6 +3639,8 @@ Whereas the section shows the creation of the getProducts selector.  So then cal
 
 So if the file shown is meant to be the products selector, then really, section 14 should be in section 15 *after* the products lib is created.
 
+### Selectors
+
 Section 14 doesn't really add any extra information about the important subject of selectors.  It only comments on re-exporting the paths in the auth libs index.ts file without anything about selectors.
 
 A potential explanation for them could include
@@ -3647,7 +3649,7 @@ A potential explanation for them could include
 2. Using the createFeatureSelector with the createSelector function.
 3. The role of the FeatureState in the AppState.
 
-The [official docs on the subject]() also include
+The [official docs on the subject](https://ngrx.io/guide/store/selectors) also include
 
 Using selectors for multiple pieces of state, Using selectors with props
 Selecting Feature States
@@ -3658,6 +3660,102 @@ The *Advanced Usage* has a subsection titled *Breaking Down the Basics*.  That s
 
 Extracting a pipeable operator
 Select the last {n} state transitions by combining selectors and RxJS operators in definitely an advanced example I'd like to go through, but the idea here is to get the basics of selectors before moving on to using them in the products page.
+
+## Re-organizing 14 & 15
+
+Walking through an idea about introducing the product modules scaffolding command in section 14, talking about a selector there, and then working on the rest of the product module in section 15.  That would be the least disruptive approach.
+
+The command and questions should look like this:
+
+```txt
+nx g @nrwl/angular:ngrx --module=libs/products/src/lib/products.module.ts --minimal false
+? What name would you like to use for the NgRx feature state? An example would be "users". products
+? Is this the root state of the application? No
+? Would you like to use a Facade with your NgRx state? No
+CREATE libs/products/src/lib/+state/products.actions.ts (424 bytes)
+CREATE libs/products/src/lib/+state/products.effects.spec.ts (1156 bytes)
+CREATE libs/products/src/lib/+state/products.effects.ts (846 bytes)
+CREATE libs/products/src/lib/+state/products.models.ts (118 bytes)
+CREATE libs/products/src/lib/+state/products.reducer.spec.ts (1085 bytes)
+CREATE libs/products/src/lib/+state/products.reducer.ts (1368 bytes)
+CREATE libs/products/src/lib/+state/products.selectors.spec.ts (1765 bytes)
+CREATE libs/products/src/lib/+state/products.selectors.ts (1108 bytes)
+UPDATE libs/products/src/lib/products.module.ts (862 bytes)
+UPDATE libs/products/src/index.ts (228 bytes)
+```
+
+libs\products\src\lib\+state\products.reducer.ts
+
+### Data models
+
+This section shows adding the file product.d.ts.  The file path shows an extra directory called data-models, which doesn't exist yet:
+
+```txt
+libs/data-models/product.d.ts
+```
+
+I'm adding it with the other for now so the directory looks like this:
+
+```txt
+.
+├── libs
+│   └── api-interface
+│   └── auth
+│   └── data-models
+│       └── src
+|           └──index.ts
+│           └── lib
+│               └── authenticate.d.ts
+│               ├── data-models.d.ts
+|               ├── product.d.ts
+|               ├──user.d.ts
+```
+
+The lib is exporting the directory "directory" file so it wont be a real issue.
+
+### Product (initial) state
+
+Section 14 shows this code:
+
+```js
+export interface ProductsState {
+  readonly products: ProductsData;
+}
+
+export const initialState: ProductsData = {
+  loading: false,
+  products: [],
+  error: ''
+};
+```
+
+The scaffolded code contains EntityState and ProductsPartialState.  About this the docs say: *This is the NgRx Entity Update type where the definition of some actions we are using the type Update. This is an auxiliary type provided by NgRx Entity to help model partial entity updates.*
+
+```js
+export interface State extends EntityState<ProductsEntity> {
+  selectedId?: string | number; // which Products record has been selected
+  loaded: boolean; // has the Products list been loaded
+  error?: string | null; // last none error (if any)
+}
+
+export interface ProductsPartialState {
+  readonly [PRODUCTS_FEATURE_KEY]: State;
+}
+
+export const productsAdapter: EntityAdapter<ProductsEntity> = createEntityAdapter<
+  ProductsEntity
+>();
+
+export interface ProductsState {
+  readonly products: ProductsData;
+}
+
+export const initialState: State = productsAdapter.getInitialState({
+  loading: false,
+  products: [],
+  error: ''
+});
+```
 
 ### Old notes
 
