@@ -12,6 +12,7 @@ It also has the Stratum app with unit tests for the counter example to create a 
 
 - [Storybook integration with Nrwl](#storybook-integration-with-Nrwl)
 - [Testing a dispatch action](#testing-a-dispatch-action)
+- [Trying out cmi5](#trying-out-cmi5)
 - [The @nxtend/ionic-react plugin](#the-@nxtend/ionic-react-plugin)
 - [Updating the Workshop](#updating-the-Workshop)
 - [Testing Ngrx](#testing-ngrx)
@@ -34,7 +35,7 @@ nx serve stromatolites # Angular app for the updated Duncan workshop code
 nx run layout:storybook # run the storybook app
 nx test layout/products # test the layout or products libs used by stromatolites
 nx test stratum --watch # run Angular Jest unit tests
-nx test stromatolites --watch0
+nx test stromatolites --watch
 yarn run server # stromatolites server runs on http://localhost:3000
 nx dep-graph # show the dependency graph
 nx affected:dep-graph # show the deo-graph with updates needed
@@ -1932,7 +1933,7 @@ constructor(private store: Store<{ count: number }>) {
 }
 ```
 
-If we implement the Ducan code in the official counter example code, there is a problem.
+If we implement the Duncan code in the official counter example code, there is a problem.
 
 ```js
 constructor(private store: Store<AppState>) {
@@ -1992,7 +1993,7 @@ export interface CounterState {
 ```
 
 Duncan's version:
-
+  
 ```js
 export interface AppState {
   counter: CounterState;
@@ -3596,8 +3597,7 @@ That helps to see them all together to get it straight what is intended.
 
 Moving on, there is a typo on the next step brief: _In this section we challenge you understanding by adding a Products module like we did for login_. "You" should be "your".
 
-Going along with it for now.  Will decided about products.selectors.ts
- while going through the next section.  It starts off with this command which last time around asked these questions:
+Going along with it for now.  Will decided about products.selectors.ts while going through the next section.  It starts off with this command which last time around asked these questions:
 
 ```bash
 ng generate ngrx products --module=libs/products/src/lib/products.module.ts
@@ -3651,14 +3651,16 @@ A potential explanation for them could include
 
 The [official docs on the subject](https://ngrx.io/guide/store/selectors) also include
 
-Using selectors for multiple pieces of state, Using selectors with props
-Selecting Feature States
-Resetting Memoized Selectors
-Using Store Without Type Generic
+- Using selectors for multiple pieces of state
+- Using selectors with props
+- Selecting Feature States
+- Resetting Memoized Selectors
+- Using Store Without Type Generic
 
 The *Advanced Usage* has a subsection titled *Breaking Down the Basics*.  That seems like a good idea just for the introduction, not saving it for an advanced portion.
 
-Extracting a pipeable operator
+### Extracting a pipe-able operator
+
 Select the last {n} state transitions by combining selectors and RxJS operators in definitely an advanced example I'd like to go through, but the idea here is to get the basics of selectors before moving on to using them in the products page.
 
 ## Re-organizing 14 & 15

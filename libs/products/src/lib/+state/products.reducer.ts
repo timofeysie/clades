@@ -45,7 +45,7 @@ const productsReducer = createReducer(
     error: null
   })),
   on(ProductsActions.loadProductsSuccess, (state, { products }) =>
-    productsAdapter.addAll(products, { ...state, loaded: true })
+    productsAdapter.addMany(products, { ...state, loaded: true })
   ),
   on(ProductsActions.loadProductsFailure, (state, { error }) => ({
     ...state,

@@ -25,10 +25,10 @@ export class AuthGuard implements CanActivate {
       map(user => {
         console.log('greetings user');
         if (user) {
-          console.log('1 by land');
+          console.log('user', user);
           return true;
         } else {
-          console.log('2 by sea');
+          console.log('no user');
           this.router.navigate([`/auth/login`]);
           return false;
         }

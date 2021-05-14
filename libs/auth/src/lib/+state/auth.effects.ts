@@ -1,39 +1,44 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Effect, Actions, ofType } from '@ngrx/effects';
-import { fetch } from '@nrwl/angular';
-import { map, tap } from 'rxjs/operators';
+import { createEffect, Actions, ofType } from '@ngrx/effects';
+import { of } from 'rxjs';
+import { catchError, map, tap, switchMap } from 'rxjs/operators';
 import { AuthActionTypes } from './auth.actions';
 import * as AuthActions from './auth.actions';
+import { User } from '@clades/data-models';
+import { AuthService } from './../services/auth/auth.service';
 
 @Injectable()
 export class AuthEffects {
-  @Effect()
-  login$ = this.actions$.pipe(
-    ofType(AuthActionTypes.Login),
-    fetch({
-      run: action => {
-        return AuthActions.loginSuccess(action);
-      },
-      onError: (error) => {
-        return AuthActions.loginFailure(error);
-      }
-    })
-  );
+  login$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(AuthActionTypes.Login),
+      switchMap(({ payload }) =>
+        this.authService.login(payload).pipe(
+          map((user: User) => AuthActions.loginSuccess({ payload: user })),
+          catchError((error) => of(AuthActions.loginFailure(error)))
+        )
+      )
+    );
+  });
 
-  @Effect({ dispatch: false })
-  navigateToProfile$ = this.actions$.pipe(
-    ofType(AuthActionTypes.LoginSuccess),
-    map((action: AuthActionTypes.LoginSuccess) => {
-      return action;
-    }),
-    tap(() => {
-      this.router.navigate([`/products`])
-    })
+  navigateToProfile$ = createEffect(() => {
+      return this.actions$.pipe(
+        ofType(AuthActionTypes.LoginSuccess),
+        map((action: AuthActionTypes.LoginSuccess) => {
+          return action;
+        }),
+        tap(() => {
+          this.router.navigate([`/products`]);
+        })
+      );
+    },
+    { dispatch: false }
   );
 
   constructor(
     private actions$: Actions,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 }
