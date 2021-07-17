@@ -4,7 +4,7 @@ This project was generated using [Nx](https://nx.dev).
 
 <p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" width="450"></p>
 
-This repo contains an updated implementation of the steps to set up an enterprise Angular applications with NgRx and Nx by Duncan Hunter.  This app is named Stromatolites after the first life on the planet.
+This repo contains various NgRx samples and an updated implementation of the steps to set up an Enterprise Angular Applications with NgRx and Nx by Duncan Hunter.  This app is named Stromatolites after the first life on the planet.
 
 It also has the Stratum app with unit tests for the counter example to create a guide for using TDD (test driven development) workflow for NgRx Angular development.
 
@@ -24,7 +24,15 @@ It also has the Stratum app with unit tests for the counter example to create a 
 
 ## Workflows
 
-Project scripts reference.
+### Main commands
+
+```txt
+nx serve stromatolites # Angular app for the updated Duncan workshop code
+nx test stromatolites --watch
+yarn run server # stromatolites server runs on http://localhost:3000
+```
+
+### Project scripts reference
 
 ```bash
 nx serve api # serve the API backend

@@ -414,3 +414,43 @@ counter.action.ts does not export anything for CounterActions which are later us
 ```
 
 I'm also surprised that there are 16 issues.  Have to look at the closed ones one of these days.
+
+## Remaining Issues
+
+From Oct 3 to May 8, 2020, these are still open issues on the GitHub.
+
+- #29 Step 14 & 15: Selectors & the Products Feature Module
+- #29 Try out react-cmi5
+- #22 Try out storybook
+- #21 Add strong typing to the auth lib state and actions
+- #19 Use an app interface for the counter example
+- #18 Add an interceptor to set a request header
+
+I think a lot of these can be closed.  If there are any issues still outstanding, they can be raised by themselves.  The next issue then would be for part 15.
+
+## Step 15
+
+The last commit about six months ago now was for the following: *#29 work done on the section 14 and 15 reorder*.
+
+The last merge request was for finishing part 13.
+
+So is part 14 finished?  Our products.selector file has a lot more in it than is shown in libs/auth/src/lib/+state/products.selectors.ts
+
+Here is the file from the course:
+
+```js
+const getProductsState = createFeatureSelector<ProductsData>('products');
+```
+
+And this is what we have currently:
+
+```js
+export const getProductsState = createFeatureSelector<
+  ProductsPartialState,
+  State
+>(PRODUCTS_FEATURE_KEY);
+```
+
+Why is there a partial state?  Where did that come from?
+
+I can vaguely recall doing some work to implement the partial state from the docs.
